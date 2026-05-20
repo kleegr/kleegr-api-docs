@@ -1,14 +1,18 @@
 ---
-title: "OAuth 2.0 Overview"
-description: "OAuth 2.0 Overview — Kleegr developer documentation"
+title: "Overview"
+description: "Overview — Kleegr developer documentation"
 ---
 
-Kleegr APIs use OAuth 2.0 for authentication.
+## Overview
 
-To get started, follow the [Authorization steps](/oauth/authorization).
+These APIs use OAuth 2.0 flow for authentication.
+
+To get started, please follow [Authorization steps](docs/oauth/Authorization.md).
 
 ### Standard Response Fields
 
-Every API response includes:
+Below we have listed the standard fields you would receive with every request.
 
-**TraceId** — a unique identifier for every request, useful for debugging.
+#### TraceId
+
+A traceId represents a unique id for every request and is returned with every response. It is useful in pinpointing the exact request and helps while debugging.

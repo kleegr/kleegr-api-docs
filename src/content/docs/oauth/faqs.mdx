@@ -1,38 +1,20 @@
 ---
-title: "OAuth FAQs"
-description: "Frequently asked questions about Kleegr OAuth 2.0."
+title: "FAQs"
+description: "FAQs — Kleegr developer documentation"
 ---
 
-## How long are access tokens valid?
+Here you will find answers to commonly encountered questions.
 
-Access tokens are valid for **24 hours**. Use the refresh token to get a new one.
+> If you are having trouble and cannot find a suitable answer, please reach out to support.
 
-## How long are refresh tokens valid?
+### How do I listen to webhook events?
 
-Refresh tokens are valid for **1 year** and reset with each use.
+For listening to the webhook events -
 
-## How should I handle token expiry?
-
-1. Make a request with the current `access_token`
-2. If you get `401 Unauthorized`, call the token refresh endpoint
-3. Store the new tokens and retry the request
-
-Write a wrapper function to handle this for all your API calls.
-
-## What are the rate limits?
-
-- **Burst:** 100 requests per 10 seconds per app per location
-- **Daily:** 200,000 requests per day per app per location
-
-Each installed location has its own independent budget.
-
-## How do I listen to webhook events?
-
-1. In your OAuth app settings, set a **Webhook URL**
-2. Add required **scopes** for the events you want
-3. Have a location admin install and authorize your app
-4. You will begin receiving webhook payloads
-
-## What webhook events are available?
-
-See the [Webhook Events](/webhooks/overview) section for the full list.
+1. Register for an app.
+2. Go to the app settings and update the webhook url (where you want to listen for events)
+3. Under the settings, also add the scope needed for the webhook event under the scopes section.
+4. Ask the location/agency admin to go to the app page in marketplace and click on "Add App".
+5. Select the location, it will redirect you to the redirect uri with the authorization code.
+6. Use the authorization code to get the access token.
+7. You would start receiving the webhook event for the location.
