@@ -6,37 +6,24 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'Kleegr Developers',
-      description: 'Developer documentation for building integrations, automations, and connected workflows with Kleegr CRM.',
+      description: 'Developer documentation for Kleegr CRM integrations.',
       favicon: '/favicon.svg',
-      logo: {
-        src: './src/assets/logo.svg',
-        replacesTitle: false,
-      },
+      logo: { src: './src/assets/logo.svg', replacesTitle: false },
       customCss: ['./src/styles/custom.css'],
       lastUpdated: false,
       pagination: true,
       social: {},
       sidebar: [
-        {
-          label: 'Getting Started',
-          items: [
-            { label: 'Introduction', slug: 'getting-started' },
-          ],
-        },
-        {
-          label: 'OAuth 2.0',
-          items: [
+        { label: 'Getting Started', items: [{ label: 'Introduction', slug: 'getting-started' }] },
+        { label: 'OAuth 2.0', items: [
             { label: 'Overview', slug: 'oauth/overview' },
             { label: 'Authorization', slug: 'oauth/authorization' },
             { label: 'Scopes', slug: 'oauth/scopes' },
             { label: 'Webhook Authentication', slug: 'oauth/webhook-authentication' },
             { label: 'External Billing', slug: 'oauth/billing' },
             { label: 'FAQs', slug: 'oauth/faqs' },
-          ],
-        },
-        {
-          label: 'Webhook Events',
-          items: [
+        ]},
+        { label: 'Webhook Events', items: [
             { label: 'Overview', slug: 'webhooks/overview' },
             { label: 'Contact Events', slug: 'webhooks/contact-events' },
             { label: 'ContactCreate', slug: 'webhooks/contact-create' },
@@ -54,11 +41,8 @@ export default defineConfig({
             { label: 'OrderCreate', slug: 'webhooks/order-create' },
             { label: 'AppInstall', slug: 'webhooks/app-install' },
             { label: 'UserCreate', slug: 'webhooks/user-create' },
-          ],
-        },
-        {
-          label: 'API Reference',
-          items: [
+        ]},
+        { label: 'API Reference', items: [
             { label: 'Overview', slug: 'api-reference/overview' },
             { label: 'Contacts', slug: 'api-reference/contacts' },
             { label: 'Conversations', slug: 'api-reference/conversations' },
@@ -80,18 +64,10 @@ export default defineConfig({
             { label: 'Courses', slug: 'api-reference/courses' },
             { label: 'Surveys', slug: 'api-reference/surveys' },
             { label: 'Sub-Accounts', slug: 'api-reference/locations' },
-          ],
-        },
-        {
-          label: 'Legal',
-          items: [
-            { label: 'API Attribution', slug: 'legal/api-attribution' },
-          ],
-        },
+        ]},
+        { label: 'Legal', items: [{ label: 'API Attribution', slug: 'legal/api-attribution' }] },
       ],
-      components: {
-        Footer: './src/components/Footer.astro',
-      },
+      components: { Footer: './src/components/Footer.astro' },
     }),
   ],
 });
