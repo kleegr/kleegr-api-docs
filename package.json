@@ -7,11 +7,15 @@
     "build": "node scripts/fetch-specs.mjs && astro build",
     "preview": "astro preview",
     "fetch-specs": "node scripts/fetch-specs.mjs",
-    "import-docs": "node scripts/import-highlevel-docs.mjs"
+    "import-docs": "node scripts/import-highlevel-docs.mjs",
+    "scrape": "node scripts/scrape-marketplace-docs.mjs",
+    "scrape:install": "npx playwright install chromium"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.32.5",
     "astro": "^5.7.10",
-    "sharp": "^0.33.5"
+    "playwright": "^1.52.0",
+    "sharp": "^0.33.5",
+    "turndown": "^7.2.4"
   }
 }
