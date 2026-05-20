@@ -1,42 +1,11 @@
 ---
-title: "Webhook Authentication Guide"
-description: "Webhook Authentication Guide — Kleegr developer documentation"
+title: "Webhook Authentication"
+description: "Verify inbound webhook signatures from Kleegr CRM."
 ---
 
-# Webhook Authentication Guide
+Every webhook payload includes an `x-wh-signature` header. Use the public key below to verify it.
 
-## How It Works
-
-### 1. Receiving the Webhook
-
-When your endpoint receives a webhook request, it will include the following:
-
-- **Headers**:
-
-  - `x-wh-signature`: The digital signature of the payload.
-
-- **Body**: The payload containing the timestamp, webhook ID, and data.
-
-Example payload:
-
-    {
-      "timestamp": "2025-01-28T14:35:00Z",
-      "webhookId": "abc123xyz",
-      ...<add_other_webhook_data>
-    }
-
-
-### 2. Verifying the Signature
-
-To verify the authenticity of the webhook request:
-
-1. Retrieve the `x-wh-signature` header from the request.
-
-2. Use the public key mentioned below to verify the signature:
-
-3. Compute the signature on your end using the payload and the public key.
-
-4. Compare your computed signature with the `x-wh-signature` header.
+## Public key
 
 ```
 -----BEGIN PUBLIC KEY-----
@@ -55,52 +24,32 @@ T1hhTiaCeIY/OwwwNUY2yvcCAwEAAQ==
 -----END PUBLIC KEY-----
 ```
 
-If they match, the payload is valid and comes from a trusted source.
+## How to verify (Node.js)
 
-### 3. Handling Replay Attacks
+```javascript
+const crypto = require('crypto');
 
-To protect against replay attacks:
+const PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAokvo...
+-----END PUBLIC KEY-----`;
 
-- Ensure the `timestamp` in the payload is within an acceptable time window (e.g., 5 minutes).
+function verifyWebhook(rawBody, signature) {
+  const verifier = crypto.createVerify('SHA256');
+  verifier.update(rawBody);
+  return verifier.verify(PUBLIC_KEY, signature, 'base64');
+}
 
-- Reject any requests with duplicate `webhookId` values.
+app.post('/webhook', (req, res) => {
+  const sig = req.headers['x-wh-signature'];
+  if (!verifyWebhook(JSON.stringify(req.body), sig)) {
+    return res.status(401).send('Invalid signature');
+  }
+  // Process webhook...
+  res.sendStatus(200);
+});
+```
 
-### 4. Handling Public Key Rotation
+## Prevent replay attacks
 
-Please keep an eye on your email and [our social channels](https://ghl-developer-council.slack.com/archives/C01F43GUJV6) for notices regarding public key rotation to stay updated. The public key in this doc is the one to use to validate the webhook payload.
-
-***
-
-
-## Example Code
-
-Here’s an example of how to verify the signature in Node.js:
-
-    const crypto = require('crypto');
-
-    const publicKey = `<use_the_above_key>`;
-
-    function verifySignature(payload, signature) {
-        const verifier = crypto.createVerify('SHA256');
-        verifier.update(payload);
-        verifier.end();
-
-        return verifier.verify(publicKey, signature, 'base64');
-    }
-
-    // Example usage
-    const payload = JSON.stringify({
-      "timestamp": "2025-01-28T14:35:00Z",
-      "webhookId": "abc123xyz",
-      ...<add_other_webhook_data>
-    });
-
-    const signature = "<received-x-wh-signature>";
-    const isValid = verifySignature(payload, signature);
-
-    return isValid;
-
-
-## Summary
-
-These new features significantly enhance the security of webhook integrations. By including a timestamp, webhook ID, and a digitally signed payload, we ensure your data remains secure and trusted. Implement these changes today to keep your integrations robust and secure!
+- Reject requests where `timestamp` is older than 5 minutes
+- Track and reject duplicate `webhookId` values
