@@ -3,9 +3,10 @@
   "type": "module",
   "version": "2.0.0",
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview"
+    "dev": "node scripts/fetch-specs.mjs && astro dev",
+    "build": "node scripts/fetch-specs.mjs && astro build",
+    "preview": "astro preview",
+    "fetch-specs": "node scripts/fetch-specs.mjs"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.32.5",
