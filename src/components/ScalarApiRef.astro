@@ -1,0 +1,60 @@
+---
+interface Props {
+  spec: string;
+  title?: string;
+}
+const { spec, title = 'API Reference' } = Astro.props;
+const uid = `scalar-${spec.replace(/[^a-z0-9]/gi, '-')}`;
+---
+
+<div class="scalar-embed not-content" id={uid} data-spec={spec}>
+  <div class="scalar-loading">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="spin">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" opacity="0.25"/>
+      <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span>Loading {title}…</span>
+  </div>
+</div>
+
+<script define:vars={{ uid, spec }}>
+  (function () {
+    var container = document.getElementById(uid);
+    if (!container) return;
+    var s = document.createElement('script');
+    s.id = 'api-reference';
+    s.setAttribute('data-url', spec);
+    s.setAttribute('data-configuration', JSON.stringify({
+      theme: 'purple',
+      layout: 'modern',
+      darkMode: document.documentElement.dataset.theme === 'dark',
+      metaData: { title: 'Kleegr API Reference' },
+    }));
+    s.src = 'https://cdn.jsdelivr.net/npm/@scalar/api-reference@1.25.72/dist/browser/standalone.min.js';
+    s.onload = function () {
+      var loading = container.querySelector('.scalar-loading');
+      if (loading) loading.remove();
+    };
+    container.innerHTML = '';
+    container.appendChild(s);
+  })();
+</script>
+
+<style>
+  .scalar-embed {
+    width: 100%;
+    min-height: 85vh;
+    margin: -1rem -1.5rem;
+    overflow: hidden;
+  }
+  .scalar-loading {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 3rem;
+    color: var(--sl-color-gray-3);
+    font-size: 0.9rem;
+  }
+  .spin { animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>

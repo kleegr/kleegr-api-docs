@@ -1,22 +1,15 @@
 {
   "name": "kleegr-api-docs",
-  "version": "1.0.0",
-  "description": "Kleegr developer documentation for integrations powered by HighLevel APIs",
-  "main": "index.js",
-  "directories": {
-    "doc": "docs"
-  },
+  "type": "module",
+  "version": "2.0.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
   },
-  "keywords": [
-    "kleegr",
-    "api",
-    "developer",
-    "docs",
-    "crm",
-    "integrations"
-  ],
-  "author": "Kleegr",
-  "license": "CC0-1.0"
+  "dependencies": {
+    "@astrojs/starlight": "^0.32.5",
+    "astro": "^5.7.10",
+    "sharp": "^0.33.5"
+  }
 }
