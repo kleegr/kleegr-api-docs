@@ -1,6 +1,3 @@
-import { defineCollection } from 'astro:content';
-import { docsLoader } from '@astrojs/starlight/loaders';
-import { docsSchema } from '@astrojs/starlight/schema';
-export const collections = {
-  docs: defineCollection({ loader: docsLoader(), schema: docsSchema() }),
-};
+# This file is intentionally left empty.
+# The actual content config is at src/content.config.ts
+# (Astro 5 Content Layer API requires src/content.config.ts)
