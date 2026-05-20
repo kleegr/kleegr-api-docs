@@ -1,0 +1,38 @@
+---
+title: External Billing
+description: Confirm external payments for paid marketplace apps.
+---
+
+If your app uses external billing, confirm payment via this webhook after the user installs and pays.
+
+## Prerequisites
+
+In [marketplace.gohighlevel.com](https://marketplace.gohighlevel.com):
+1. Business model set to **Paid**
+2. **External Billing** enabled
+3. **Billing URL** configured
+
+## Billing URL parameters
+
+| Parameter | Values |
+|-----------|--------|
+| `clientId` | Your client ID |
+| `installType` | `location`, `agency`, or `agency,location` |
+| `locationId` | Present for location installs |
+| `companyId` | Present for agency installs |
+
+## Confirm payment
+
+```bash
+curl -X POST https://services.leadconnectorhq.com/oauth/billing/webhook \
+  -H "x-ghl-client-key: YOUR_CLIENT_KEY" \
+  -H "x-ghl-client-secret: YOUR_CLIENT_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{"clientId":"YOUR_ID","authType":"location","locationId":"LOC_ID","amount":49,"status":"COMPLETED","paymentType":"recurring"}'
+```
+
+| Field | Values |
+|-------|--------|
+| `authType` | `location` or `company` |
+| `status` | `COMPLETED` or `FAILED` |
+| `paymentType` | `one_time` or `recurring` |

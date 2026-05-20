@@ -1,0 +1,29 @@
+---
+title: API Attribution
+description: Legal and technical attribution for Kleegr developer integrations.
+---
+
+## Technical attribution
+
+Kleegr developer integrations are powered by HighLevel APIs. Certain technical references are retained exactly as-is for integration accuracy.
+
+## What is retained and why
+
+| Reference | Reason |
+|-----------|--------|
+| `marketplace.gohighlevel.com` OAuth registration | Developers must register OAuth apps here |
+| `marketplace.leadconnectorhq.com` OAuth URL | Required for white-label deployment flows |
+| `services.leadconnectorhq.com` API base URL | The actual endpoint for all API calls |
+| OAuth scope strings (e.g. `contacts.readonly`) | Part of the API contract — must be exact |
+| All endpoint paths (e.g. `/contacts/search`) | The actual URL paths for API calls |
+| Field names and schema definitions | Required for correct request/response handling |
+| Webhook signature public key | Required to verify webhook authenticity |
+| Rate limit headers (`X-RateLimit-*`) | Documented for developer monitoring |
+
+## Documentation source
+
+This documentation is based on the [GoHighLevel API V2 documentation](https://github.com/GoHighLevel/highlevel-api-docs), released under CC0 1.0 Universal (public domain).
+
+## Trademarks
+
+"GoHighLevel" and "HighLevel" are trademarks of HighLevel Inc. Kleegr is not affiliated with or endorsed by HighLevel Inc. Technical references are used solely for integration accuracy.

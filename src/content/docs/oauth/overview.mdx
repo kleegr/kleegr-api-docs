@@ -1,0 +1,35 @@
+---
+title: OAuth 2.0 Overview
+description: How authentication works for Kleegr API integrations.
+---
+
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+Kleegr uses the **OAuth 2.0 Authorization Code Grant** flow. Your app requests permission to access a CRM location on a user's behalf, receives an authorization code, and exchanges it for access and refresh tokens.
+
+## Flow summary
+
+1. Send the user to the **Authorization URL** with your `client_id` and `scopes`
+2. The user selects their Kleegr CRM location and grants permission
+3. They are redirected to your `redirect_uri` with a `code`
+4. Your server exchanges `code` for `access_token` + `refresh_token`
+5. Use `access_token` in `Authorization: Bearer` header on every API call
+
+## Base URLs
+
+| Purpose | URL |
+|---------|-----|
+| Standard authorization | `https://marketplace.gohighlevel.com/oauth/chooselocation` |
+| White-label authorization | `https://marketplace.leadconnectorhq.com/oauth/chooselocation` |
+| Token exchange | `https://services.leadconnectorhq.com/oauth/token` |
+| All API calls | `https://services.leadconnectorhq.com` |
+
+## Guides
+
+<CardGrid>
+  <LinkCard title="Authorization" href="/oauth/authorization" description="Step-by-step OAuth flow and token exchange." />
+  <LinkCard title="Scopes" href="/oauth/scopes" description="Full list of available permission scopes." />
+  <LinkCard title="Webhook Authentication" href="/oauth/webhook-authentication" description="Verify inbound webhook signatures." />
+  <LinkCard title="External Billing" href="/oauth/billing" description="Confirm external payments for marketplace apps." />
+  <LinkCard title="FAQs" href="/oauth/faqs" description="Token expiry, refresh behavior, common questions." />
+</CardGrid>
