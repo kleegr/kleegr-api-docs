@@ -2,7 +2,7 @@
 // Imports the full GoHighLevel API docs into Kleegr Starlight format.
 // Auto-clones the upstream repo if not present.
 // Usage: node scripts/import-highlevel-docs.mjs
-// Then:  git add -A && git commit -m 'docs: import' && git push
+// Then:  npm run build && git add -A && git commit -m 'docs: import' && git push
 
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, copyFileSync, existsSync, statSync } from 'fs';
 import { join } from 'path';
@@ -16,10 +16,10 @@ const SPECS_OUT = join(PROJECT, 'public/specs');
 
 // Auto-clone upstream if not present
 if (!existsSync(UPSTREAM)) {
-  console.log(`\n📥 Cloning upstream docs to ${UPSTREAM}...`);
+  console.log(`\n\uD83D\uDCE5 Cloning upstream docs to ${UPSTREAM}...`);
   execSync(`git clone --depth=1 ${UPSTREAM_URL} ${UPSTREAM}`, { stdio: 'inherit' });
 } else {
-  console.log(`\n✓ Using upstream docs at ${UPSTREAM}`);
+  console.log(`\n\u2713 Using upstream docs at ${UPSTREAM}`);
 }
 
 function slug(str) {
@@ -28,23 +28,137 @@ function slug(str) {
 
 function ensureDir(p) { mkdirSync(p, { recursive: true }); }
 
-function rebrand(md) {
-  const segments = [];
-  let pos = 0;
-  const codeRe = /(```[\s\S]*?```|`[^`]+`)/g;
-  let m;
-  while ((m = codeRe.exec(md)) !== null) {
-    if (m.index > pos) segments.push({ type: 'prose', text: md.slice(pos, m.index) });
-    segments.push({ type: 'code', text: m[0] });
-    pos = m.index + m[0].length;
+// ── MDX post-processing — fixes all upstream Markdown quirks that break MDX ──
+
+function fixMdx(body) {
+  // 1. Remove HTML comments
+  body = body.replace(/<!--[\s\S]*?-->/g, '');
+
+  // 2. Fix invalid code block language hints (e.g. ```json json_schema -> ```json)
+  body = body.replace(/```(json|javascript|js|bash|python|yaml|xml|html|css|typescript|ts)\s+\S+/g, '```$1');
+  body = body.replace(/```json\{/g, '```json');
+
+  // 3. Split on fenced code blocks so we only modify prose
+  const parts = body.split(/(```[\s\S]*?```)/g);
+
+  const fixedParts = parts.map((part, i) => {
+    if (i % 2 === 1) return part; // inside code block — leave alone
+
+    // 4. <b>text</b> -> **text**
+    part = part.replace(/<b>([\s\S]*?)<\/b>/g, '**$1**');
+
+    // 5. <hr> -> ---
+    part = part.replace(/<hr\s*\/?>/g, '\n---\n');
+
+    // 6. <br> -> newline
+    part = part.replace(/<\/?br\s*\/?>/g, '\n');
+
+    // 7. Remove </hr>, </br>, </img> (invalid closing tags)
+    part = part.replace(/<\/(br|hr|img)\s*>/g, '');
+
+    // 8. Remove raw <ol>, <ul>, <li> tags (convert to markdown)
+    part = part.replace(/<ol[^>]*>/g, '').replace(/<\/ol>/g, '');
+    part = part.replace(/<ul[^>]*>/g, '').replace(/<\/ul>/g, '');
+    part = part.replace(/<li[^>]*>/g, '- ').replace(/<\/li>/g, '');
+
+    // 9. {{...}} Handlebars expressions -> backtick wrapped
+    part = part.replace(/\{\{([^}]+)\}\}/g, (_, inner) => '`{{' + inner + '}}`');
+
+    // 10. Bare {identifier} JSX expressions in prose -> backtick wrapped
+    part = part.replace(/\{([a-zA-Z_][a-zA-Z0-9_.]*(?:\s*\|\s*[a-zA-Z_][a-zA-Z0-9_.]*)*)\}/g, (m, inner) => {
+      // Skip things that look like real JSX (starts with uppercase, has ..., etc.)
+      if (inner[0] === inner[0].toUpperCase() && inner[0] !== inner[0].toLowerCase()) return m;
+      if (inner.includes('...') || inner.includes('import')) return m;
+      return '`{' + inner + '}`';
+    });
+
+    // 11. Wrap <placeholder-name> in backticks (angle-bracket vars in tables/prose)
+    const htmlTags = new Set(['div','span','a','p','ul','ol','li','img','br','hr','strong',
+      'em','b','i','h1','h2','h3','h4','h5','h6','table','tr','td','th','thead','tbody',
+      'blockquote','pre','code','details','summary','section','article','nav','header','footer']);
+    part = part.replace(/<([^>\n]+)>/g, (m, inner) => {
+      const tagName = inner.trim().split(/[\s/]/)[0].toLowerCase();
+      if (htmlTags.has(tagName)) return m;
+      if (inner[0] && inner[0] === inner[0].toUpperCase()) return m; // component
+      if (inner.startsWith('/')) return m; // closing tag
+      if (inner.startsWith('http')) return '`<' + inner + '>`';
+      if (inner.includes('=') || inner.includes(' ')) return m; // has attributes
+      return '`<' + inner + '>`';
+    });
+
+    return part;
+  });
+
+  body = fixedParts.join('');
+
+  // 12. Convert 4-space indented blocks to fenced code blocks
+  //     (only outside fenced blocks, only in body not frontmatter)
+  body = convertIndented(body);
+
+  // 13. Merge split code blocks (artifact of indented conversion)
+  for (let i = 0; i < 5; i++) {
+    const before = body;
+    body = body.replace(/(```)(\n(?:[^\n]+\n){1,15})(```)/g, (m, open, middle, close) => {
+      // Only merge if the middle doesn't contain a language hint opening
+      if (/```[a-z]/.test(middle)) return m;
+      return middle.trimEnd();
+    });
+    if (body === before) break;
   }
-  if (pos < md.length) segments.push({ type: 'prose', text: md.slice(pos) });
-  return segments.map(seg => {
-    if (seg.type === 'code') return seg.text;
-    let t = seg.text;
-    t = t.replace(/\bGoHighLevel\b(?![./\w-])/g, 'Kleegr');
-    t = t.replace(/\bHighLevel\b(?![./\w-])/g, 'Kleegr');
-    return t;
+
+  return body;
+}
+
+function convertIndented(body) {
+  const lines = body.split('\n');
+  const result = [];
+  let inFence = false;
+  let fenceStr = '';
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+    const fm = line.match(/^(`{3,}|~{3,})/);
+    if (fm) {
+      if (!inFence) { inFence = true; fenceStr = fm[1]; }
+      else if (line.startsWith(fenceStr)) { inFence = false; fenceStr = ''; }
+      result.push(line);
+      i++;
+      continue;
+    }
+    if (inFence) { result.push(line); i++; continue; }
+
+    // Collect 4-space indented block
+    if (line.startsWith('    ') && line.trim()) {
+      const block = [];
+      while (i < lines.length && (lines[i].startsWith('    ') || (lines[i].trim() === '' && i + 1 < lines.length && lines[i+1]?.startsWith('    ')))) {
+        block.push(lines[i]);
+        i++;
+      }
+      while (block.length && !block[block.length-1].trim()) block.pop();
+      const dedented = block.map(l => l.startsWith('    ') ? l.slice(4) : l);
+      result.push('```');
+      result.push(...dedented);
+      result.push('```');
+      result.push('');
+      continue;
+    }
+
+    result.push(line);
+    i++;
+  }
+  return result.join('\n');
+}
+
+// ── Rebranding ────────────────────────────────────────────────────────────────
+
+function rebrand(md) {
+  const parts = md.split(/(```[\s\S]*?```|`[^`]+`)/g);
+  return parts.map((p, i) => {
+    if (i % 2 === 1) return p;
+    return p
+      .replace(/\bGoHighLevel\b(?![./\w-])/g, 'Kleegr')
+      .replace(/\bHighLevel\b(?![./\w-])/g, 'Kleegr');
   }).join('');
 }
 
@@ -53,39 +167,43 @@ function extractTitle(md, fallback) {
   return m ? m[1].trim() : fallback;
 }
 
-function convertMd(srcPath, title) {
+function convertMd(srcPath, titleFallback) {
   let content = readFileSync(srcPath, 'utf-8');
-  const detectedTitle = extractTitle(content, title);
-  // Strip upstream YAML frontmatter if present
+  // Strip upstream YAML frontmatter
   content = content.replace(/^---[\s\S]*?---\n/, '');
-  content = rebrand(content);
+  const detectedTitle = extractTitle(content, titleFallback);
   // Strip first h1
   content = content.replace(/^#\s+.+\n/, '');
-  const safeTitle = detectedTitle.replace(/"/g, '\\"').replace(/\bGoHighLevel\b/g, 'Kleegr').replace(/\bHighLevel\b/g, 'Kleegr');
-  const fm = `---\ntitle: "${safeTitle}"\ndescription: "${safeTitle} — Kleegr developer documentation"\n---\n\n`;
+  content = rebrand(content);
+  // Apply MDX fixes to the body
+  content = fixMdx(content);
+  const safeTitle = detectedTitle
+    .replace(/\bGoHighLevel\b/g, 'Kleegr')
+    .replace(/\bHighLevel\b/g, 'Kleegr')
+    .replace(/"/g, '\\"');
+  const fm = `---\ntitle: "${safeTitle}"\ndescription: "${safeTitle} \u2014 Kleegr developer documentation"\n---\n\n`;
   return fm + content.trimStart();
 }
 
-console.log('\n📄 Importing docs/ markdown files...');
+// ── Step 1: Import docs markdown files ───────────────────────────────────────
+
+console.log('\n\uD83D\uDCC4 Importing docs/ markdown files...');
 const docsMap = {};
 
 function processDocsDir(srcDir, destDir, prefix) {
   ensureDir(destDir);
-  const entries = readdirSync(srcDir, { withFileTypes: true });
-  for (const e of entries) {
+  for (const e of readdirSync(srcDir, { withFileTypes: true })) {
     const srcPath = join(srcDir, e.name);
     if (e.isDirectory()) {
-      const newPrefix = prefix ? `${prefix}/${slug(e.name)}` : slug(e.name);
-      processDocsDir(srcPath, join(destDir, slug(e.name)), newPrefix);
+      const p = prefix ? `${prefix}/${slug(e.name)}` : slug(e.name);
+      processDocsDir(srcPath, join(destDir, slug(e.name)), p);
     } else if (e.name.endsWith('.md')) {
       const name = e.name.replace(/\.md$/, '');
       const destSlug = prefix ? `${prefix}/${slug(name)}` : slug(name);
       const destPath = join(destDir, `${slug(name)}.mdx`);
-      const converted = convertMd(srcPath, name);
-      writeFileSync(destPath, converted);
-      const relSrc = srcPath.replace(UPSTREAM + '/', '');
-      docsMap[relSrc] = destSlug;
-      console.log(`  ok ${relSrc}`);
+      writeFileSync(destPath, convertMd(srcPath, name));
+      docsMap[srcPath.replace(UPSTREAM + '/', '')] = destSlug;
+      console.log(`  ok ${e.name}`);
     }
   }
 }
@@ -93,13 +211,14 @@ function processDocsDir(srcDir, destDir, prefix) {
 for (const d of ['oauth', 'webhooks', 'marketplace-modules', 'country-reference']) {
   ensureDir(join(DOCS_OUT, d));
 }
-
 processDocsDir(join(UPSTREAM, 'docs/oauth'), join(DOCS_OUT, 'oauth'), 'oauth');
 processDocsDir(join(UPSTREAM, 'docs/webhook events'), join(DOCS_OUT, 'webhooks'), 'webhooks');
 processDocsDir(join(UPSTREAM, 'docs/marketplace modules'), join(DOCS_OUT, 'marketplace-modules'), 'marketplace-modules');
 processDocsDir(join(UPSTREAM, 'docs/country list'), join(DOCS_OUT, 'country-reference'), 'country-reference');
 
-console.log('\n📦 Copying all 41 OpenAPI specs...');
+// ── Step 2: Copy all 41 OpenAPI specs ────────────────────────────────────────
+
+console.log('\n\uD83D\uDCE6 Copying all 41 OpenAPI specs...');
 ensureDir(SPECS_OUT);
 const appsDir = join(UPSTREAM, 'apps');
 const specFiles = readdirSync(appsDir).filter(f => f.endsWith('.json'));
@@ -109,7 +228,9 @@ for (const f of specFiles) {
 }
 console.log(`  Total: ${specFiles.length} specs`);
 
-console.log('\n🔌 Generating API reference pages...');
+// ── Step 3: Generate API reference pages ─────────────────────────────────────
+
+console.log('\n\uD83D\uDD0C Generating API reference pages...');
 const API_NAMES = {
   'ad-manager':'Ad Manager API','affiliate-manager':'Affiliate Manager API',
   'agent-studio':'Agent Studio API','associations':'Associations API',
@@ -131,14 +252,15 @@ const API_NAMES = {
 };
 
 ensureDir(join(DOCS_OUT, 'api-reference'));
-
 for (const f of specFiles) {
   const s = f.replace('.json', '');
   const name = API_NAMES[s] || `${s} API`;
   writeFileSync(join(DOCS_OUT, `api-reference/${s}.mdx`),
-    `---\ntitle: "${name}"\ndescription: "Kleegr ${name} — full interactive OpenAPI reference."\ntableOfContents: false\n---\n\nimport ScalarApiRef from '../../../components/ScalarApiRef.astro';\n\n<ScalarApiRef spec="/specs/${f}" title="${name}" />\n`);
+    `---\ntitle: "${name}"\ndescription: "Kleegr ${name} \u2014 full interactive OpenAPI reference."\ntableOfContents: false\n---\n\nimport ScalarApiRef from '../../../components/ScalarApiRef.astro';\n\n<ScalarApiRef spec="/specs/${f}" title="${name}" />\n`);
   console.log(`  ok api-reference/${s}.mdx`);
 }
+
+// ── Step 4: Generate astro.config.mjs sidebar ────────────────────────────────
 
 const toc = JSON.parse(readFileSync(join(UPSTREAM, 'toc.json'), 'utf-8'));
 const webhookItems = toc.items
@@ -170,7 +292,8 @@ const sidebar = [
   ]},
 ];
 
-const config = `import { defineConfig } from 'astro/config';
+writeFileSync(join(PROJECT, 'astro.config.mjs'),
+`import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
 const sidebar = ${JSON.stringify(sidebar, null, 2)};
@@ -192,11 +315,9 @@ export default defineConfig({
     }),
   ],
 });
-`;
-writeFileSync(join(PROJECT, 'astro.config.mjs'), config);
-console.log('\n✓ astro.config.mjs updated');
+`);
+console.log('\n\u2713 astro.config.mjs updated');
 
-console.log(`\n✅ Import complete! ${Object.keys(docsMap).length} docs, ${specFiles.length} specs, ${specFiles.length + 1} API pages`);
-console.log('\nNext steps:');
-console.log('  npm run build   # verify 116 pages');
-console.log('  git add -A && git commit -m "docs: full import" && git push');
+console.log(`\n\u2705 Import complete! ${Object.keys(docsMap).length} docs, ${specFiles.length} specs, ${specFiles.length + 1} API pages`);
+console.log('\nNext: npm run build   (should say Indexed 116 pages)');
+console.log('Then: git add -A && git commit -m "docs: full import" && git push');
