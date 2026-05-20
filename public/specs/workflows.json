@@ -1,5 +1,32 @@
 {
   "openapi": "3.0.0",
-  "info": { "title": "Kleegr Workflows API", "version": "1.0" },
-  "paths": {} 
+  "paths": {
+    "/workflows/": {
+      "get": {
+        "operationId": "get-workflow",
+        "summary": "Get Workflow",
+        "tags": ["Workflows"],
+        "security": [{"bearer": ["workflows.readonly"]}],
+        "parameters": [
+          {"name": "Version", "in": "header", "required": true, "schema": {"type": "string", "enum": ["2021-07-28"]}},
+          {"name": "locationId", "required": true, "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {
+          "200": {"description": "Success", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/GetWorkflowSuccessfulResponseDto"}}}},
+          "400": {"description": "Bad Request"},
+          "401": {"description": "Unauthorized"}
+        }
+      }
+    }
+  },
+  "info": {"title": "Workflows API", "description": "Kleegr Workflows API", "version": "1.0"},
+  "tags": [{"name": "Workflows"}],
+  "servers": [{"url": "https://services.leadconnectorhq.com"}],
+  "components": {
+    "securitySchemes": {"bearer": {"scheme": "bearer", "bearerFormat": "JWT", "name": "Authorization", "in": "header", "type": "http"}},
+    "schemas": {
+      "WorkflowSchema": {"type": "object", "properties": {"id": {"type": "string"}, "name": {"type": "string"}, "status": {"type": "string"}, "version": {"type": "number"}, "locationId": {"type": "string"}}},
+      "GetWorkflowSuccessfulResponseDto": {"type": "object", "properties": {"workflows": {"type": "array", "items": {"$ref": "#/components/schemas/WorkflowSchema"}}}}
+    }
+  }
 }
