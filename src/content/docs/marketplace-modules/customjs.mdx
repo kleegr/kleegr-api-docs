@@ -24,7 +24,8 @@ await  AppUtils.Storage.setData(key,  value); //  Store  data
 await  AppUtils.Storage.getData(key); //  Retrieve  data
 ```
 
-<br/>
+
+
 
 **Cookies Wrapper:**
 
@@ -42,7 +43,9 @@ await AppUtils.Storage.setCookie(key, value) // Store data in a cookie
 await AppUtils.Storage.getCookie(key) // Retrieve cookie value
 ```
 
-<hr/>
+
+---
+
 
 ### 2. Custom Events:
 
@@ -60,7 +63,9 @@ window.addEventListener('routeLoaded',callback)
 window.addEventListener('routeChangeEvent',callback)
 ```
 
-<hr>
+
+---
+
 
 ### 3. Routing Methods:
 
@@ -71,8 +76,7 @@ Custom scripts can now control routing within the application via exposed method
 - **getCurrentRoute()**: Get the current route info.
 - **navigate(options:INavigationOptions)**: Allows you to navigate to a different route via name or path.
 
-```js
- interface INavigationOptions{
+```js INavigationOptions{
   name?: string
   path?: string
   params?: Record<string,  string>
@@ -94,7 +98,9 @@ const currentRoute = await AppUtils.RouteHelper.getCurrentRoute();
 console.log(currentRoute); // Logs current route information {fullPath, name, params, path, query}
 ```
 
-<hr>
+
+---
+
 
 ### 4. Utility Methods:
 

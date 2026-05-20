@@ -29,31 +29,28 @@ To generate the Authorization Page URL for an app, replace the `client_id`, `red
 
 1. For standard Auth URL flow:
 
-```
+
 https://marketplace.gohighlevel.com/oauth/chooselocation?
 response_type=code&
 redirect_uri=https://myapp.com/oauth/callback/gohighlevel&
 client_id=CLIENT_ID&
 scope=conversations/message.readonly conversations/message.write
-```
 
 2. For White-labeled Auth URL flow:
 
-```
+
 https://marketplace.leadconnectorhq.com/oauth/chooselocation?
 response_type=code&
 redirect_uri=https://myapp.com/oauth/callback/gohighlevel&
 client_id=CLIENT_ID&
 scope=conversations/message.readonly conversations/message.write
-```
 
-<b>NOTE:</b> For the users who are not logged in to the application at the time of giving consent, developer has option to initiate login in new tab or in same tab. For initiating login in same tab, developer need to append `&loginWindowOpenMode=self` to authorization url. If the query param not passed, login in new tab would be default.
+**NOTE:** For the users who are not logged in to the application at the time of giving consent, developer has option to initiate login in new tab or in same tab. For initiating login in same tab, developer need to append `&loginWindowOpenMode=self` to authorization url. If the query param not passed, login in new tab would be default.
 
 When a user grants access, their browser is redirected to the specified redirect URI, and the Authorization Code is passed inside the code query parameter.
 
-```
+
 https://myapp.com/oauth/callback/gohighlevel?code=7676cjcbdc6t76cdcbkjcd09821jknnkj
-```
 
 ## OAuth FAQs
 

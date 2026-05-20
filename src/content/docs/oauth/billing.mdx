@@ -21,18 +21,17 @@ When an Agency or Location installs your app, they will be redirected to the Bil
 
 | Parameter Name | Possible Values      | Notes                                                                   |
 | -------------- | -------------------- | ----------------------------------------------------------------------- |
-| clientId       | `<client_id>`        | Used for validation.                                                    |
+| clientId       | ``<client_id>``        | Used for validation.                                                    |
 | installType    | `location`, `agency` | You will receive `agency,location` in case of both agency and location. |
-| locationId     | `<location_id>`      | You will receive this in case of `location` or `agency,location`.       |
-| companyId      | `<agency_id>`        | You will receive this in case of `agency` or `agency,location`.         |
+| locationId     | ``<location_id>``      | You will receive this in case of `location` or `agency,location`.       |
+| companyId      | ``<agency_id>``        | You will receive this in case of `agency` or `agency,location`.         |
 
 ## 3. Using The Webhook
 
 After successfully processing the payment on your end, you need to make a request to our billing webhook endpoint:
 
-```
+
 https://services.leadconnectorhq.com/oauth/billing/webhook
-```
 
 The parameters you need to include in the webhook request are as follows:
 
@@ -53,8 +52,8 @@ POST
 | -------------- | -------------------- | ----------------------------------------------------------------- |
 | clientId       | Your client ID       |                                                                   |
 | authType       | Enum                 | Possible values are `company` and `location`.                     |
-| locationId     | `<location_id>`      | Required when authType is `location`.                             |
-| companyId      | `<company_id>`       | Required when authType is `company`.                              |
+| locationId     | ``<location_id>``      | Required when authType is `location`.                             |
+| companyId      | ``<company_id>``       | Required when authType is `company`.                              |
 | subscriptionId | Your subscription ID | You can include this if you have configured a subscription model. |
 | paymentId      | Your Payment ID      | In case of a one-time payment model, you can send this parameter. |
 | amount         | Billed Amount        | Required.                                                         |
