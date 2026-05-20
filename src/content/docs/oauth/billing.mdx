@@ -1,20 +1,44 @@
 ---
-title: External Billing
-description: Confirm external payments for paid marketplace apps.
+title: "External Billing"
+description: "External Billing for Kleegr Marketplace apps."
 ---
+
+If your app uses external billing, confirm payment after the user installs and pays.
 
 ## Prerequisites
 
-At [marketplace.gohighlevel.com](https://marketplace.gohighlevel.com): Business model = Paid, External Billing enabled, Billing URL configured.
+In your [Marketplace app settings](https://marketplace.gohighlevel.com):
+1. Business model set to **Paid**
+2. **External Billing** enabled
+3. **Billing URL** configured
 
-## Confirm payment endpoint
+## Billing URL parameters
+
+When a user installs your app, they are sent to your Billing URL with these parameters:
+
+| Parameter | Values | Notes |
+|-----------|--------|-------|
+| `clientId` | `<client_id>` | For validation |
+| `installType` | `location`, `agency`, `agency,location` | Install context |
+| `locationId` | `<location_id>` | Present for location or both |
+| `companyId` | `<agency_id>` | Present for agency or both |
+
+## Confirm payment
 
 ```bash
 curl -X POST https://services.leadconnectorhq.com/oauth/billing/webhook \
-  -H "x-ghl-client-key: YOUR_KEY" \
-  -H "x-ghl-client-secret: YOUR_SECRET" \
+  -H "x-ghl-client-key: YOUR_CLIENT_KEY" \
+  -H "x-ghl-client-secret: YOUR_CLIENT_SECRET" \
   -H "Content-Type: application/json" \
-  -d '{"clientId":"ID","authType":"location","locationId":"LOC","amount":49,"status":"COMPLETED","paymentType":"recurring"}'
+  -d '{
+    "clientId": "YOUR_CLIENT_ID",
+    "authType": "location",
+    "locationId": "LOCATION_ID",
+    "subscriptionId": "sub_abc123",
+    "amount": 49,
+    "status": "COMPLETED",
+    "paymentType": "recurring"
+  }'
 ```
 
 | Field | Values |

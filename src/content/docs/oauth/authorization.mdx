@@ -1,50 +1,86 @@
 ---
-title: Authorization
-description: OAuth 2.0 Authorization Code Grant flow for Kleegr CRM integrations.
+title: "Authorization"
+description: "OAuth 2.0 Authorization Code Grant flow for Kleegr CRM integrations."
 ---
 
-import { Steps, Aside } from '@astrojs/starlight/components';
+Kleegr supports the Authorization Code Grant flow with v2 APIs.
 
-<Steps>
+Here's a [Loom Video](https://www.loom.com/share/f32384758de74a4dbb647e0b7962c4ea?sid=0907a66d-a160-4b51-bcd4-c47ebae37fca) walkthrough of the entire process.
 
-1. **Register an OAuth app** at [marketplace.gohighlevel.com](https://marketplace.gohighlevel.com) under My Apps.
+## 1. Register an OAuth app
 
-2. **Build the Authorization URL**
+1. Go to the [Marketplace](https://marketplace.gohighlevel.com)
+2. Sign up for a developer account.
+3. Go to **My Apps** and click **Create App**.
+4. Fill in the required details. Your app will be created.
+5. Click the app to configure scopes, generate keys, etc.
 
-   ```
-   https://marketplace.gohighlevel.com/oauth/chooselocation?
-   response_type=code&redirect_uri=https://yourapp.com/callback&
-   client_id=YOUR_CLIENT_ID&scope=contacts.readonly
-   ```
+## 2. Add the app to a location
 
-   White-label: use `marketplace.leadconnectorhq.com` instead.
+1. Make the location/agency admin go to the app's Authorization Page URL.
+2. They select the location they want to connect.
+3. They are redirected to the redirect URL with the Authorization Code.
+4. Use the Authorization Code to get the Access Token.
+5. Use the Access Token to call any API.
 
-3. **Handle the callback** — user is sent to `https://yourapp.com/callback?code=AUTH_CODE`
+## 3. Build the Authorization URL
 
-4. **Exchange code for tokens**
+Replace `client_id`, `redirect_uri`, and `scope` below:
 
-   ```bash
-   curl -X POST https://services.leadconnectorhq.com/oauth/token \
-     -H "Content-Type: application/x-www-form-urlencoded" \
-     -d "client_id=YOUR_CLIENT_ID&client_secret=YOUR_SECRET" \
-     -d "grant_type=authorization_code&code=AUTH_CODE" \
-     -d "redirect_uri=https://yourapp.com/callback"
-   ```
+**Standard flow:**
+```
+https://marketplace.gohighlevel.com/oauth/chooselocation?
+response_type=code&
+redirect_uri=https://myapp.com/oauth/callback/gohighlevel&
+client_id=CLIENT_ID&
+scope=conversations/message.readonly conversations/message.write
+```
 
-5. **Refresh the token** (tokens expire after 24 hours)
+**White-label flow:**
+```
+https://marketplace.leadconnectorhq.com/oauth/chooselocation?
+response_type=code&
+redirect_uri=https://myapp.com/oauth/callback/gohighlevel&
+client_id=CLIENT_ID&
+scope=conversations/message.readonly conversations/message.write
+```
 
-   ```bash
-   curl -X POST https://services.leadconnectorhq.com/oauth/token \
-     -H "Content-Type: application/x-www-form-urlencoded" \
-     -d "client_id=YOUR_CLIENT_ID&client_secret=YOUR_SECRET" \
-     -d "grant_type=refresh_token&refresh_token=YOUR_REFRESH_TOKEN"
-   ```
+**Note:** To initiate login in the same tab, append `&loginWindowOpenMode=self`. Otherwise login opens in a new tab.
 
-</Steps>
+After the user grants access, they are redirected to:
+
+```
+https://myapp.com/oauth/callback/gohighlevel?code=7676cjcbdc6t76cdcbkjcd09821jknnkj
+```
+
+## 4. Exchange the code for tokens
+
+```bash
+curl -X POST https://services.leadconnectorhq.com/oauth/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "client_id=YOUR_CLIENT_ID" \
+  -d "client_secret=YOUR_CLIENT_SECRET" \
+  -d "grant_type=authorization_code" \
+  -d "code=AUTH_CODE" \
+  -d "redirect_uri=https://myapp.com/oauth/callback/gohighlevel"
+```
+
+## 5. Refresh the token
+
+```bash
+curl -X POST https://services.leadconnectorhq.com/oauth/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "client_id=YOUR_CLIENT_ID" \
+  -d "client_secret=YOUR_CLIENT_SECRET" \
+  -d "grant_type=refresh_token" \
+  -d "refresh_token=YOUR_REFRESH_TOKEN"
+```
 
 ## Rate limits
 
 | Limit | Value |
 |-------|-------|
-| Burst | 100 req / 10 sec per app per location |
-| Daily | 200,000 req / day per app per location |
+| Burst | 100 requests / 10 seconds per app per location |
+| Daily | 200,000 requests / day per app per location |
+
+Response headers: `X-RateLimit-Limit-Daily`, `X-RateLimit-Daily-Remaining`, `X-RateLimit-Interval-Milliseconds`, `X-RateLimit-Max`, `X-RateLimit-Remaining`
