@@ -1,0 +1,22 @@
+---
+title: AppointmentCreate
+description: Webhook payload when a new appointment is booked in Kleegr CRM.
+---
+
+```json
+{
+  "type": "AppointmentCreate",
+  "locationId": "0007BWpSzSwfiuSl0tR2",
+  "appointment": {
+    "id": "apt_abc123", "title": "Discovery Call",
+    "calendarId": "BqTwX8QFwXzpegMve9EQ",
+    "contactId": "9NkT25Vor1v4aQatFsv2",
+    "appointmentStatus": "confirmed",
+    "assignedUserId": "YlWd2wuCAZQzh2cH1fVZ",
+    "startTime": "2024-01-20T14:00:00+00:00",
+    "endTime": "2024-01-20T14:30:00+00:00"
+  }
+}
+```
+
+**Required scope:** `calendars/events.readonly`

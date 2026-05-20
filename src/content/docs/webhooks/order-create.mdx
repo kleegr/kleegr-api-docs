@@ -1,0 +1,16 @@
+---
+title: OrderCreate
+description: Webhook payload when a new order is placed.
+---
+
+```json
+{
+  "type": "OrderCreate",
+  "locationId": "ve9EPM428h8vShlRW1KT",
+  "id": "order_abc123",
+  "contactId": "nmFmQEsNgz6AVpgLVUJ0",
+  "status": "pending", "totalAmount": 99.99, "currency": "USD"
+}
+```
+
+**Required scope:** `payments.readonly`

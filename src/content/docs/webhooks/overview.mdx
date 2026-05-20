@@ -1,0 +1,41 @@
+---
+title: Webhook Events
+description: Real-time webhook event payloads for Kleegr CRM activity.
+---
+
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+Kleegr delivers webhook events when activity occurs in a CRM location.
+
+## Setup
+
+1. In your OAuth app, set a **Webhook URL** in app settings
+2. Add the relevant **scopes** for the events you want
+3. Events arrive as `POST` requests with JSON bodies
+4. Verify signatures using [Webhook Authentication](/oauth/webhook-authentication)
+
+## Available events
+
+<CardGrid>
+  <LinkCard title="Contact Events" href="/webhooks/contact-events" description="ContactCreate, ContactUpdate, ContactDelete, ContactTagUpdate" />
+  <LinkCard title="InboundMessage" href="/webhooks/inbound-message" description="Incoming SMS, email, call, or chat" />
+  <LinkCard title="OutboundMessage" href="/webhooks/outbound-message" description="Outgoing messages" />
+  <LinkCard title="AppointmentCreate" href="/webhooks/appointment-create" description="New appointment booked" />
+  <LinkCard title="InvoiceCreate" href="/webhooks/invoice-create" description="Invoice created" />
+  <LinkCard title="InvoicePaid" href="/webhooks/invoice-paid" description="Invoice fully paid" />
+  <LinkCard title="OpportunityCreate" href="/webhooks/opportunity-create" description="New pipeline opportunity" />
+  <LinkCard title="OrderCreate" href="/webhooks/order-create" description="New order placed" />
+  <LinkCard title="AppInstall" href="/webhooks/app-install" description="App installed on a location" />
+</CardGrid>
+
+## Payload structure
+
+Every event includes at minimum:
+
+```json
+{
+  "type": "EventName",
+  "locationId": "LOCATION_ID",
+  "webhookId": "unique-event-id"
+}
+```

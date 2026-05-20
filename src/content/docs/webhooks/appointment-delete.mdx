@@ -1,0 +1,10 @@
+---
+title: AppointmentDelete
+description: Webhook payload when an appointment is deleted.
+---
+
+```json
+{"type": "AppointmentDelete", "locationId": "...", "appointment": {"id": "apt_abc123", "appointmentStatus": "cancelled"}}
+```
+
+**Required scope:** `calendars/events.readonly`

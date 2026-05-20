@@ -1,0 +1,19 @@
+---
+title: OutboundMessage
+description: Webhook payload when a message is sent from a Kleegr CRM location.
+---
+
+```json
+{
+  "type": "OutboundMessage",
+  "locationId": "l1C08ntBrFjLS0elLIYU",
+  "body": "Hi Jane, following up!",
+  "contactId": "cI08i1Bls3iTB9bKgFJh",
+  "conversationId": "fcanlLgpbQgQhderivVs",
+  "dateAdded": "2024-01-15T10:00:00.000Z",
+  "direction": "outbound", "messageType": "SMS",
+  "source": "app", "status": "sent"
+}
+```
+
+**Required scope:** `conversations/message.readonly`

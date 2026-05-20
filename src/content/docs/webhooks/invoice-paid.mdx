@@ -1,0 +1,16 @@
+---
+title: InvoicePaid
+description: Webhook payload when an invoice is fully paid.
+---
+
+```json
+{
+  "type": "InvoicePaid",
+  "locationId": "ve9EPM428h8vShlRW1KT",
+  "id": "inv_abc123",
+  "contactId": "nmFmQEsNgz6AVpgLVUJ0",
+  "status": "paid", "amountPaid": 150.00, "amountDue": 0
+}
+```
+
+**Required scope:** `invoices.readonly`

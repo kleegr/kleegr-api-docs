@@ -1,0 +1,26 @@
+---
+title: ContactCreate
+description: Webhook payload fired when a new contact is created in a Kleegr CRM location.
+---
+
+```json
+{
+  "type": "ContactCreate",
+  "locationId": "ve9EPM428h8vShlRW1KT",
+  "id": "nmFmQEsNgz6AVpgLVUJ0",
+  "firstName": "Jane", "lastName": "Smith",
+  "name": "Jane Smith",
+  "email": "jane@example.com",
+  "phone": "+15551234567",
+  "address1": "123 Main St",
+  "city": "Springfield", "state": "IL", "country": "US",
+  "companyName": "Acme Corp",
+  "source": "web form", "dnd": false,
+  "tags": ["lead", "new"],
+  "dateAdded": "2024-01-15T10:00:00.000Z",
+  "assignedTo": "YlWd2wuCAZQzh2cH1fVZ",
+  "customFields": [{"id": "field_id", "value": "value"}]
+}
+```
+
+**Required scope:** `contacts.readonly`

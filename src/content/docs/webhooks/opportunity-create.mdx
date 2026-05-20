@@ -1,0 +1,22 @@
+---
+title: OpportunityCreate
+description: Webhook payload when a new opportunity is created.
+---
+
+```json
+{
+  "type": "OpportunityCreate",
+  "locationId": "ve9EPM428h8vShlRW1KT",
+  "id": "opp_abc123",
+  "contactId": "nmFmQEsNgz6AVpgLVUJ0",
+  "name": "Enterprise Deal - Acme Corp",
+  "monetaryValue": 5000,
+  "pipelineId": "WH9lbGUoY7ZNoHi9q1SK",
+  "pipelineStageId": "stage_abc123",
+  "status": "open", "assignedTo": "YlWd2wuCAZQzh2cH1fVZ"
+}
+```
+
+**Related events:** `OpportunityUpdate`, `OpportunityStageUpdate`, `OpportunityStatusUpdate`, `OpportunityDelete`
+
+**Required scope:** `opportunities.readonly`

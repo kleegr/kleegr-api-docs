@@ -1,0 +1,36 @@
+---
+title: InboundMessage
+description: Webhook payload when a contact sends a message to a Kleegr CRM location.
+---
+
+Fired when a contact sends a message. Channels: SMS, Email, Call, Voicemail, GMB, Facebook, Instagram, Live Chat.
+
+## SMS
+
+```json
+{
+  "type": "InboundMessage",
+  "locationId": "l1C08ntBrFjLS0elLIYU",
+  "attachments": [], "body": "Hi, I have a question",
+  "contactId": "cI08i1Bls3iTB9bKgFJh",
+  "conversationId": "fcanlLgpbQgQhderivVs",
+  "dateAdded": "2024-01-15T10:00:00.000Z",
+  "direction": "inbound", "messageType": "SMS",
+  "status": "delivered"
+}
+```
+
+## Call
+
+```json
+{
+  "type": "InboundMessage",
+  "locationId": "l1C08ntBrFjLS0elLIYU",
+  "contactId": "cI08i1Bls3iTB9bKgFJh",
+  "direction": "inbound", "messageType": "CALL",
+  "status": "completed", "callDuration": 180, "callStatus": "completed",
+  "attachments": ["https://recordings.example.com/call.mp3"]
+}
+```
+
+**Required scope:** `conversations/message.readonly`

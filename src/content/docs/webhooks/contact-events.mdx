@@ -1,0 +1,54 @@
+---
+title: Contact Events
+description: Webhook payloads for ContactCreate, ContactUpdate, ContactDelete, ContactTagUpdate, ContactDndUpdate.
+---
+
+## ContactCreate
+
+```json
+{
+  "type": "ContactCreate",
+  "locationId": "ve9EPM428h8vShlRW1KT",
+  "id": "nmFmQEsNgz6AVpgLVUJ0",
+  "firstName": "Jane", "lastName": "Smith",
+  "email": "jane@example.com", "phone": "+15551234567",
+  "tags": ["lead", "new"], "dnd": false,
+  "dateAdded": "2024-01-15T10:00:00.000Z"
+}
+```
+
+## ContactUpdate
+
+Same schema, `type: "ContactUpdate"`. Only changed fields are included.
+
+## ContactDelete
+
+```json
+{ "type": "ContactDelete", "locationId": "...", "id": "..." }
+```
+
+## ContactTagUpdate
+
+```json
+{
+  "type": "ContactTagUpdate",
+  "locationId": "...", "id": "...",
+  "tags": ["lead", "hot", "follow-up"]
+}
+```
+
+## ContactDndUpdate
+
+```json
+{
+  "type": "ContactDndUpdate",
+  "locationId": "...", "id": "...",
+  "dnd": true,
+  "dndSettings": {
+    "SMS": {"status": "inactive"},
+    "Email": {"status": "active"}
+  }
+}
+```
+
+**Required scope:** `contacts.readonly`
