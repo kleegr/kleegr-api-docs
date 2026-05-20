@@ -5,13 +5,19 @@
   "scripts": {
     "dev": "node scripts/fetch-specs.mjs && astro dev",
     "build": "node scripts/fetch-specs.mjs && astro build",
-    "preview": "astro preview",
+    "preview": "npm run build && wrangler dev",
     "fetch-specs": "node scripts/fetch-specs.mjs",
-    "import-docs": "node scripts/import-highlevel-docs.mjs"
+    "import-docs": "node scripts/import-highlevel-docs.mjs",
+    "deploy": "npm run build && wrangler deploy",
+    "cf-typegen": "wrangler types"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "12",
     "@astrojs/starlight": "^0.32.5",
     "astro": "^5.7.10",
     "sharp": "^0.33.5"
+  },
+  "devDependencies": {
+    "wrangler": "^4.93.0"
   }
 }
