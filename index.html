@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kleegr Developer Docs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0f0e13;
+    --paper: #f7f6f2;
+    --mid: #e8e6df;
+    --muted: #8a8680;
+    --accent: #5b3de8;
+    --accent-light: #ede9fd;
+    --accent-glow: rgba(91,61,232,0.15);
+    --green: #1a8a5c;
+    --green-bg: #e8f6ef;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Sora', sans-serif;
+    --radius: 10px;
+    --shadow: 0 2px 16px rgba(15,14,19,0.07);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(247,246,242,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--mid);
+    padding: 0 2rem;
+    height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo {
+    font-weight: 700; font-size: 1rem; letter-spacing: -0.02em;
+    display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--ink);
+  }
+  .nav-logo-mark {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: var(--accent); display: grid; place-items: center;
+  }
+  .nav-logo-mark svg { width: 16px; height: 16px; fill: white; }
+  .nav-badge {
+    font-family: var(--mono); font-size: 0.65rem; font-weight: 500;
+    background: var(--accent-light); color: var(--accent);
+    padding: 2px 8px; border-radius: 99px; letter-spacing: 0.04em;
+  }
+  .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+  .nav-links a {
+    text-decoration: none; color: var(--muted); font-size: 0.85rem; font-weight: 400;
+    transition: color 0.15s;
+  }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-cta {
+    background: var(--accent); color: white !important;
+    padding: 6px 16px; border-radius: 7px;
+    font-weight: 600 !important; font-size: 0.82rem !important;
+    transition: opacity 0.15s !important;
+  }
+  .nav-cta:hover { opacity: 0.88; color: white !important; }
+
+  /* ── HERO ── */
+  .hero {
+    max-width: 860px; margin: 0 auto;
+    padding: 72px 2rem 56px;
+  }
+  .hero-eyebrow {
+    font-family: var(--mono); font-size: 0.72rem; font-weight: 500;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px; margin-bottom: 20px;
+  }
+  .hero-eyebrow::before {
+    content: ''; display: block;
+    width: 24px; height: 1px; background: var(--accent);
+  }
+  h1 {
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    font-weight: 700; line-height: 1.08;
+    letter-spacing: -0.04em; margin-bottom: 20px;
+  }
+  h1 span { color: var(--accent); }
+  .hero-sub {
+    font-size: 1.1rem; color: #4a4850; max-width: 560px;
+    font-weight: 300; margin-bottom: 36px; line-height: 1.65;
+  }
+  .hero-links {
+    display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 48px;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 10px 20px; border-radius: 8px;
+    font-size: 0.88rem; font-weight: 600;
+    text-decoration: none; transition: all 0.15s;
+    font-family: var(--sans);
+  }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #4a32c7; }
+  .btn-ghost {
+    background: white; color: var(--ink);
+    border: 1px solid var(--mid); box-shadow: var(--shadow);
+  }
+  .btn-ghost:hover { border-color: #c8c5bb; }
+  .btn svg { width: 14px; height: 14px; }
+
+  /* ── QUICKSTART ── */
+  .quickstart {
+    background: var(--ink); border-radius: var(--radius);
+    padding: 28px 32px; margin-bottom: 72px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+  }
+  @media (max-width: 640px) { .quickstart { grid-template-columns: 1fr; } }
+  .qs-label {
+    font-family: var(--mono); font-size: 0.68rem; font-weight: 500;
+    color: #6b6875; letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .qs-steps { display: flex; flex-direction: column; gap: 10px; }
+  .qs-step {
+    display: flex; align-items: flex-start; gap: 10px;
+    color: #c8c4d4; font-size: 0.85rem;
+  }
+  .qs-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #2a2835; color: var(--accent);
+    font-family: var(--mono); font-size: 0.68rem; font-weight: 500;
+    display: grid; place-items: center; flex-shrink: 0; margin-top: 1px;
+  }
+  .qs-code {
+    font-family: var(--mono); font-size: 0.78rem;
+    color: #e2dff5; line-height: 1.7;
+  }
+  .qs-code .hl { color: #a78bfa; }
+  .qs-code .str { color: #86efac; }
+  .qs-code .key { color: #93c5fd; }
+
+  /* ── SECTION ── */
+  .section {
+    max-width: 860px; margin: 0 auto;
+    padding: 0 2rem 72px;
+  }
+  .section-header {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  h2 {
+    font-size: 1.35rem; font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+  .section-count {
+    font-family: var(--mono); font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  /* ── GRID ── */
+  .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
+  @media (max-width: 640px) {
+    .grid-3, .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: white; border: 1px solid var(--mid);
+    border-radius: var(--radius); padding: 20px 22px;
+    text-decoration: none; color: var(--ink);
+    transition: all 0.15s; display: block;
+    box-shadow: 0 1px 4px rgba(15,14,19,0.04);
+  }
+  .card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow), var(--shadow);
+    transform: translateY(-1px);
+  }
+  .card-icon {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: var(--accent-light); display: grid; place-items: center;
+    margin-bottom: 12px; font-size: 1rem;
+  }
+  .card-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 4px; }
+  .card-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+
+  /* ── DOC CARD ── */
+  .doc-card {
+    background: white; border: 1px solid var(--mid);
+    border-radius: var(--radius); padding: 16px 18px;
+    text-decoration: none; color: var(--ink);
+    transition: all 0.15s; display: flex;
+    align-items: center; justify-content: space-between;
+    box-shadow: 0 1px 4px rgba(15,14,19,0.04);
+  }
+  .doc-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  .doc-card-left { display: flex; align-items: center; gap: 12px; }
+  .doc-tag {
+    font-family: var(--mono); font-size: 0.65rem; font-weight: 500;
+    background: var(--accent-light); color: var(--accent);
+    padding: 2px 7px; border-radius: 4px; flex-shrink: 0;
+  }
+  .doc-name { font-size: 0.85rem; font-weight: 500; }
+  .doc-arrow { color: var(--muted); font-size: 0.8rem; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none; border-top: 1px solid var(--mid);
+    max-width: 860px; margin: 0 auto 56px;
+  }
+
+  /* ── STATUS BAR ── */
+  .status-bar {
+    max-width: 860px; margin: 0 auto;
+    padding: 0 2rem 32px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green); flex-shrink: 0;
+    box-shadow: 0 0 0 3px var(--green-bg);
+  }
+  .status-text {
+    font-family: var(--mono); font-size: 0.72rem;
+    color: var(--muted);
+  }
+  .status-text strong { color: var(--green); font-weight: 500; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--mid);
+    padding: 28px 2rem;
+    display: flex; justify-content: center; align-items: center;
+    gap: 24px; flex-wrap: wrap;
+  }
+  footer a {
+    font-size: 0.78rem; color: var(--muted);
+    text-decoration: none; transition: color 0.15s;
+  }
+  footer a:hover { color: var(--ink); }
+  .footer-sep { color: var(--mid); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-1 { animation: fadeUp 0.45s ease both; }
+  .fade-2 { animation: fadeUp 0.45s 0.07s ease both; }
+  .fade-3 { animation: fadeUp 0.45s 0.14s ease both; }
+  .fade-4 { animation: fadeUp 0.45s 0.21s ease both; }
+  .fade-5 { animation: fadeUp 0.45s 0.28s ease both; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">
+    <div class="nav-logo-mark">
+      <svg viewBox="0 0 16 16"><path d="M3 8l4-4 2 2 4-4v2l-4 4-2-2-4 4V8z"/></svg>
+    </div>
+    Kleegr Developers
+    <span class="nav-badge">API v2</span>
+  </a>
+  <div class="nav-links">
+    <a href="#apis">APIs</a>
+    <a href="#oauth">OAuth</a>
+    <a href="#webhooks">Webhooks</a>
+    <a href="https://github.com/kleegr/kleegr-api-docs" target="_blank">GitHub</a>
+    <a href="https://crm.kleegr.com" class="nav-cta">CRM Login</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow fade-1">Developer Documentation</div>
+  <h1 class="fade-2">Build with<br><span>Kleegr</span></h1>
+  <p class="hero-sub fade-3">Build integrations, automate workflows, and connect external systems with Kleegr-powered CRM accounts using the full API surface.</p>
+  <div class="hero-links fade-4">
+    <a href="#quickstart" class="btn btn-primary">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,2 10,7 4,12"/></svg>
+      Quick start
+    </a>
+    <a href="https://github.com/kleegr/kleegr-api-docs" target="_blank" class="btn btn-ghost">
+      <svg viewBox="0 0 14 14" fill="currentColor"><path d="M7 0C3.13 0 0 3.13 0 7c0 3.1 2.01 5.73 4.79 6.66.35.06.48-.15.48-.34v-1.2C3.29 12.52 2.88 11.1 2.88 11.1c-.32-.81-.78-1.02-.78-1.02-.64-.44.05-.43.05-.43.7.05 1.07.72 1.07.72.63 1.07 1.64.76 2.04.58.06-.45.24-.76.44-.93-1.56-.18-3.2-.78-3.2-3.47 0-.77.27-1.4.72-1.89-.07-.18-.31-.9.07-1.87 0 0 .59-.19 1.93.72A6.7 6.7 0 017 3.83c.6.003 1.2.08 1.76.24 1.34-.91 1.93-.72 1.93-.72.38.97.14 1.69.07 1.87.45.49.72 1.12.72 1.89 0 2.7-1.64 3.29-3.21 3.47.25.22.48.65.48 1.31v1.94c0 .19.13.4.48.34C11.99 12.73 14 10.1 14 7c0-3.87-3.13-7-7-7z"/></svg>
+      View on GitHub
+    </a>
+  </div>
+
+  <div class="quickstart fade-5" id="quickstart">
+    <div>
+      <div class="qs-label">Quick start</div>
+      <div class="qs-steps">
+        <div class="qs-step"><div class="qs-num">1</div><span>Register an OAuth app at <strong style="color:#e2dff5">marketplace.gohighlevel.com</strong></span></div>
+        <div class="qs-step"><div class="qs-num">2</div><span>Redirect the user to the Authorization URL with your <code style="color:#a78bfa;font-family:var(--mono);font-size:.8em">client_id</code> and <code style="color:#a78bfa;font-family:var(--mono);font-size:.8em">scopes</code></span></div>
+        <div class="qs-step"><div class="qs-num">3</div><span>Exchange the authorization code for an access token</span></div>
+        <div class="qs-step"><div class="qs-num">4</div><span>Call any API endpoint using the access token</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="qs-label">Example request</div>
+      <div class="qs-code">
+<span class="hl">GET</span> <span class="str">/contacts/search</span>
+
+<span class="key">Authorization:</span> Bearer <span class="str">{access_token}</span>
+<span class="key">Version:</span> <span class="str">2021-07-28</span>
+<span class="key">Content-Type:</span> <span class="str">application/json</span>
+
+<span style="color:#4a4860">// 200 OK</span>
+{
+  <span class="key">"contacts"</span>: [...],
+  <span class="key">"total"</span>: <span class="hl">142</span>
+}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="apis">
+  <div class="section-header">
+    <h2>API Reference</h2>
+    <span class="section-count">41 domains</span>
+  </div>
+  <div class="grid-3">
+    <a class="card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/apps/contacts.json" target="_blank">
+      <div class="card-icon">👤</div>
+      <div class="card-title">Contacts</div>
+      <div class="card-desc">Create, update, search, and tag contacts in any sub-account</div>
+    </a>
+    <a class="card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/apps/conversations.json" target="_blank">
+      <div class="card-icon">💬</div>
+      <div class="card-title">Conversations</div>
+      <div class="card-desc">Send and receive messages across SMS, email, and more</div>
+    </a>
+    <a class="card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/apps/calendars.json" target="_blank">
+      <div class="card-icon">📅</div>
+      <div class="card-title">Calendars</div>
+      <div class="card-desc">Manage calendars, available slots, and appointments</div>
+    </a>
+    <a class="card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/apps/opportunities.json" target="_blank">
+      <div class="card-icon">📈</div>
+      <div class="card-title">Opportunities</div>
+      <div class="card-desc">Track pipeline stages, deal values, and owners</div>
+    </a>
+    <a class="card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/apps/invoices.json" target="_blank">
+      <div class="card-icon">🧾</div>
+      <div class="card-title">Invoices</div>
+      <div class="card-desc">Create, send, and track invoices end-to-end</div>
+    </a>
+    <a class="card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/apps/payments.json" target="_blank">
+      <div class="card-icon">💳</div>
+      <div class="card-title">Payments</div>
+      <div class="card-desc">Process payments, subscriptions, and transactions</div>
+    </a>
+    <a class="card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/apps/workflows.json" target="_blank">
+      <div class="card-icon">⚡</div>
+      <div class="card-title">Workflows</div>
+      <div class="card-desc">Trigger and manage automation workflows programmatically</div>
+    </a>
+    <a class="card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/apps/users.json" target="_blank">
+      <div class="card-icon">🔑</div>
+      <div class="card-title">Users</div>
+      <div class="card-desc">Manage CRM users, roles, and permissions</div>
+    </a>
+    <a class="card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/apps/locations.json" target="_blank">
+      <div class="card-icon">🏢</div>
+      <div class="card-title">Sub-Accounts</div>
+      <div class="card-desc">Create and configure CRM locations (sub-accounts)</div>
+    </a>
+    <a class="card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/apps/forms.json" target="_blank">
+      <div class="card-icon">📋</div>
+      <div class="card-title">Forms</div>
+      <div class="card-desc">Retrieve form definitions and submission data</div>
+    </a>
+    <a class="card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/apps/products.json" target="_blank">
+      <div class="card-icon">📦</div>
+      <div class="card-title">Products</div>
+      <div class="card-desc">Manage products, prices, and catalog items</div>
+    </a>
+    <a class="card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/apps" target="_blank">
+      <div class="card-icon">＋</div>
+      <div class="card-title">30 more APIs</div>
+      <div class="card-desc">Blogs, Funnels, Social Planner, Snapshots, SaaS, and more</div>
+    </a>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="section" id="oauth">
+  <div class="section-header"><h2>OAuth 2.0 Guides</h2></div>
+  <div class="grid-2">
+    <a class="doc-card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/docs/oauth/Overview.md" target="_blank">
+      <div class="doc-card-left"><span class="doc-tag">Guide</span><span class="doc-name">OAuth 2.0 Overview</span></div>
+      <span class="doc-arrow">↗</span>
+    </a>
+    <a class="doc-card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/docs/oauth/Authorization.md" target="_blank">
+      <div class="doc-card-left"><span class="doc-tag">Guide</span><span class="doc-name">Authorization Flow</span></div>
+      <span class="doc-arrow">↗</span>
+    </a>
+    <a class="doc-card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/docs/oauth/Scopes.md" target="_blank">
+      <div class="doc-card-left"><span class="doc-tag">Reference</span><span class="doc-name">Scopes</span></div>
+      <span class="doc-arrow">↗</span>
+    </a>
+    <a class="doc-card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/docs/oauth/WebhookAuthentication.md" target="_blank">
+      <div class="doc-card-left"><span class="doc-tag">Guide</span><span class="doc-name">Webhook Authentication</span></div>
+      <span class="doc-arrow">↗</span>
+    </a>
+    <a class="doc-card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/docs/oauth/Billing.md" target="_blank">
+      <div class="doc-card-left"><span class="doc-tag">Guide</span><span class="doc-name">External Billing</span></div>
+      <span class="doc-arrow">↗</span>
+    </a>
+    <a class="doc-card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/docs/oauth/Faqs.md" target="_blank">
+      <div class="doc-card-left"><span class="doc-tag">FAQ</span><span class="doc-name">OAuth FAQs</span></div>
+      <span class="doc-arrow">↗</span>
+    </a>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="section" id="webhooks">
+  <div class="section-header">
+    <h2>Webhook Events</h2>
+    <span class="section-count">58 events</span>
+  </div>
+  <div class="grid-2">
+    <a class="doc-card" href="https://github.com/kleegr/kleegr-api-docs/tree/main/docs/webhook%20events" target="_blank">
+      <div class="doc-card-left"><span class="doc-tag">Contact</span><span class="doc-name">ContactCreate / Update / Delete</span></div>
+      <span class="doc-arrow">↗</span>
+    </a>
+    <a class="doc-card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/docs/webhook%20events/InboundMessage.md" target="_blank">
+      <div class="doc-card-left"><span class="doc-tag">Message</span><span class="doc-name">InboundMessage / OutboundMessage</span></div>
+      <span class="doc-arrow">↗</span>
+    </a>
+    <a class="doc-card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/docs/webhook%20events/AppointmentCreate.md" target="_blank">
+      <div class="doc-card-left"><span class="doc-tag">Calendar</span><span class="doc-name">AppointmentCreate / Update / Delete</span></div>
+      <span class="doc-arrow">↗</span>
+    </a>
+    <a class="doc-card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/docs/webhook%20events/InvoiceCreate.md" target="_blank">
+      <div class="doc-card-left"><span class="doc-tag">Invoice</span><span class="doc-name">InvoiceCreate / Paid / Void / Sent</span></div>
+      <span class="doc-arrow">↗</span>
+    </a>
+    <a class="doc-card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/docs/webhook%20events/OpportunityCreate.md" target="_blank">
+      <div class="doc-card-left"><span class="doc-tag">CRM</span><span class="doc-name">OpportunityCreate / Update / Stage</span></div>
+      <span class="doc-arrow">↗</span>
+    </a>
+    <a class="doc-card" href="https://github.com/kleegr/kleegr-api-docs/blob/main/docs/webhook%20events/AppInstall.md" target="_blank">
+      <div class="doc-card-left"><span class="doc-tag">App</span><span class="doc-name">AppInstall / AppUninstall</span></div>
+      <span class="doc-arrow">↗</span>
+    </a>
+  </div>
+</div>
+
+<div class="status-bar">
+  <div class="status-dot"></div>
+  <span class="status-text">Kleegr integrations are powered by <strong>HighLevel APIs</strong> &nbsp;·&nbsp; Some technical references to HighLevel appear where required for API accuracy &nbsp;·&nbsp; CC0 1.0 License</span>
+</div>
+
+<footer>
+  <a href="https://kleegr.com">kleegr.com</a>
+  <span class="footer-sep">·</span>
+  <a href="https://crm.kleegr.com">CRM Login</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/kleegr/kleegr-api-docs">GitHub</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/kleegr/kleegr-api-docs/blob/main/docs-config-notes.md">Publishing Guide</a>
+  <span class="footer-sep">·</span>
+  <a href="https://github.com/kleegr/kleegr-api-docs/blob/main/BRANDING-AUDIT.md">Branding Audit</a>
+</footer>
+
+</body>
+</html>
