@@ -1,42 +1,70 @@
 ---
-title: API Reference
-description: Full OpenAPI reference for all Kleegr API domains.
+title: "API Reference"
+description: "Full interactive API reference for all 41 Kleegr API domains. Powered by Scalar."
 ---
 
-Full interactive API reference for all Kleegr CRM endpoints. Each page loads the full OpenAPI spec with request/response schemas, code samples, and a try-it-out panel powered by Scalar.
+Full interactive API reference for all Kleegr CRM endpoints. Every page includes live request/response schemas, code samples, and a try-it-out console powered by Scalar.
 
-All endpoints are served at `https://services.leadconnectorhq.com`.
+**Base URL:** `https://services.leadconnectorhq.com`
 
-Required headers on every request:
-- `Authorization: Bearer ACCESS_TOKEN`
-- `Version: 2021-07-28`
+**Required headers:**
+```
+Authorization: Bearer ACCESS_TOKEN
+Version: 2021-07-28
+```
 
 ## Core APIs
 
 <div class="api-cards">
-  <a class="api-card" href="/api-reference/contacts"><span class="api-card-icon">👤</span><div class="api-card-title">Contacts</div><div class="api-card-desc">Create, update, search, tag, and manage contacts</div></a>
-  <a class="api-card" href="/api-reference/conversations"><span class="api-card-icon">💬</span><div class="api-card-title">Conversations</div><div class="api-card-desc">Send/receive messages across SMS, email, and more</div></a>
-  <a class="api-card" href="/api-reference/calendars"><span class="api-card-icon">📅</span><div class="api-card-title">Calendars</div><div class="api-card-desc">Calendars, availability slots, and appointments</div></a>
-  <a class="api-card" href="/api-reference/opportunities"><span class="api-card-icon">📈</span><div class="api-card-title">Opportunities</div><div class="api-card-desc">Pipeline stages, deal values, and owners</div></a>
+  <a class="api-card" href="/api-reference/contacts"><span class="api-card-icon">👤</span><div class="api-card-title">Contacts</div><div class="api-card-desc">Create, update, search, tag, merge, and manage contacts</div></a>
+  <a class="api-card" href="/api-reference/conversations"><span class="api-card-icon">💬</span><div class="api-card-title">Conversations</div><div class="api-card-desc">SMS, email, Facebook, Instagram, GMB, live chat</div></a>
+  <a class="api-card" href="/api-reference/calendars"><span class="api-card-icon">📅</span><div class="api-card-title">Calendars</div><div class="api-card-desc">Calendars, slots, groups, and appointments</div></a>
+  <a class="api-card" href="/api-reference/opportunities"><span class="api-card-icon">📈</span><div class="api-card-title">Opportunities</div><div class="api-card-desc">Pipeline stages, values, and owners</div></a>
   <a class="api-card" href="/api-reference/invoices"><span class="api-card-icon">🧾</span><div class="api-card-title">Invoices</div><div class="api-card-desc">Create, send, and track invoices</div></a>
-  <a class="api-card" href="/api-reference/payments"><span class="api-card-icon">💳</span><div class="api-card-title">Payments</div><div class="api-card-desc">Process payments and subscriptions</div></a>
-  <a class="api-card" href="/api-reference/users"><span class="api-card-icon">🔑</span><div class="api-card-title">Users</div><div class="api-card-desc">Manage CRM users, roles, and permissions</div></a>
-  <a class="api-card" href="/api-reference/workflows"><span class="api-card-icon">⚡</span><div class="api-card-title">Workflows</div><div class="api-card-desc">Trigger and manage automation workflows</div></a>
+  <a class="api-card" href="/api-reference/payments"><span class="api-card-icon">💳</span><div class="api-card-title">Payments</div><div class="api-card-desc">Transactions, subscriptions, and orders</div></a>
+  <a class="api-card" href="/api-reference/users"><span class="api-card-icon">🔑</span><div class="api-card-title">Users</div><div class="api-card-desc">CRM users, roles, and permissions</div></a>
+  <a class="api-card" href="/api-reference/workflows"><span class="api-card-icon">⚡</span><div class="api-card-title">Workflows</div><div class="api-card-desc">Automation workflow management</div></a>
+  <a class="api-card" href="/api-reference/locations"><span class="api-card-icon">🏢</span><div class="api-card-title">Sub-Accounts</div><div class="api-card-desc">Create and configure CRM locations</div></a>
+  <a class="api-card" href="/api-reference/products"><span class="api-card-icon">📦</span><div class="api-card-title">Products</div><div class="api-card-desc">Products, prices, and inventory</div></a>
+  <a class="api-card" href="/api-reference/store"><span class="api-card-icon">🛒</span><div class="api-card-title">Store</div><div class="api-card-desc">E-commerce store management</div></a>
 </div>
 
-## Additional APIs
+## Communication and Content
 
 <div class="api-cards">
-  <a class="api-card" href="/api-reference/locations"><span class="api-card-icon">🏢</span><div class="api-card-title">Sub-Accounts</div><div class="api-card-desc">Create and configure CRM locations</div></a>
-  <a class="api-card" href="/api-reference/businesses"><span class="api-card-icon">🏬</span><div class="api-card-title">Businesses</div><div class="api-card-desc">Business records linked to contacts</div></a>
-  <a class="api-card" href="/api-reference/forms"><span class="api-card-icon">📋</span><div class="api-card-title">Forms</div><div class="api-card-desc">Form definitions and submissions</div></a>
-  <a class="api-card" href="/api-reference/surveys"><span class="api-card-icon">📊</span><div class="api-card-title">Surveys</div><div class="api-card-desc">Survey responses and data</div></a>
+  <a class="api-card" href="/api-reference/emails"><span class="api-card-icon">📧</span><div class="api-card-title">Emails</div><div class="api-card-desc">Email sending and management</div></a>
+  <a class="api-card" href="/api-reference/email-isv"><span class="api-card-icon">📨</span><div class="api-card-title">LC Email</div><div class="api-card-desc">LC Email provider integration</div></a>
+  <a class="api-card" href="/api-reference/social-media-posting"><span class="api-card-icon">📱</span><div class="api-card-title">Social Planner</div><div class="api-card-desc">Schedule posts across social platforms</div></a>
   <a class="api-card" href="/api-reference/blogs"><span class="api-card-icon">✍️</span><div class="api-card-title">Blogs</div><div class="api-card-desc">Blog sites, posts, and authors</div></a>
   <a class="api-card" href="/api-reference/funnels"><span class="api-card-icon">🔻</span><div class="api-card-title">Funnels</div><div class="api-card-desc">Funnel pages and redirect tracking</div></a>
   <a class="api-card" href="/api-reference/courses"><span class="api-card-icon">🎓</span><div class="api-card-title">Courses</div><div class="api-card-desc">Membership and course management</div></a>
+  <a class="api-card" href="/api-reference/forms"><span class="api-card-icon">📋</span><div class="api-card-title">Forms</div><div class="api-card-desc">Forms and submissions</div></a>
+  <a class="api-card" href="/api-reference/surveys"><span class="api-card-icon">📊</span><div class="api-card-title">Surveys</div><div class="api-card-desc">Survey responses and data</div></a>
   <a class="api-card" href="/api-reference/medias"><span class="api-card-icon">🗂</span><div class="api-card-title">Media Library</div><div class="api-card-desc">File and image management</div></a>
+</div>
+
+## Advanced and Platform
+
+<div class="api-cards">
+  <a class="api-card" href="/api-reference/objects"><span class="api-card-icon">🔷</span><div class="api-card-title">Custom Objects</div><div class="api-card-desc">Custom data object schemas</div></a>
+  <a class="api-card" href="/api-reference/associations"><span class="api-card-icon">🔗</span><div class="api-card-title">Associations</div><div class="api-card-desc">Define relationships between objects</div></a>
+  <a class="api-card" href="/api-reference/custom-fields"><span class="api-card-icon">🏷</span><div class="api-card-title">Custom Fields</div><div class="api-card-desc">Custom field definitions</div></a>
+  <a class="api-card" href="/api-reference/custom-menus"><span class="api-card-icon">🗂</span><div class="api-card-title">Custom Menus</div><div class="api-card-desc">Sidebar menu customization</div></a>
+  <a class="api-card" href="/api-reference/businesses"><span class="api-card-icon">🏬</span><div class="api-card-title">Businesses</div><div class="api-card-desc">Business records linked to contacts</div></a>
+  <a class="api-card" href="/api-reference/companies"><span class="api-card-icon">🏛</span><div class="api-card-title">Companies</div><div class="api-card-desc">Agency-level company records</div></a>
+  <a class="api-card" href="/api-reference/links"><span class="api-card-icon">🔗</span><div class="api-card-title">Trigger Links</div><div class="api-card-desc">Trackable automation trigger links</div></a>
   <a class="api-card" href="/api-reference/snapshots"><span class="api-card-icon">📸</span><div class="api-card-title">Snapshots</div><div class="api-card-desc">Account configuration snapshots</div></a>
   <a class="api-card" href="/api-reference/campaigns"><span class="api-card-icon">📣</span><div class="api-card-title">Campaigns</div><div class="api-card-desc">Campaign management</div></a>
-  <a class="api-card" href="/api-reference/companies"><span class="api-card-icon">🏛</span><div class="api-card-title">Companies</div><div class="api-card-desc">Company records</div></a>
-  <a class="api-card" href="/api-reference/social-media-posting"><span class="api-card-icon">📱</span><div class="api-card-title">Social Planner</div><div class="api-card-desc">Schedule social media posts</div></a>
+  <a class="api-card" href="/api-reference/marketplace"><span class="api-card-icon">🎪</span><div class="api-card-title">Marketplace</div><div class="api-card-desc">App marketplace management</div></a>
+  <a class="api-card" href="/api-reference/saas-api"><span class="api-card-icon">☁️</span><div class="api-card-title">SaaS</div><div class="api-card-desc">SaaS mode and reseller tools</div></a>
+  <a class="api-card" href="/api-reference/phone-system"><span class="api-card-icon">📞</span><div class="api-card-title">Phone System</div><div class="api-card-desc">Phone numbers and call routing</div></a>
+  <a class="api-card" href="/api-reference/voice-ai"><span class="api-card-icon">🎤</span><div class="api-card-title">Voice AI</div><div class="api-card-desc">AI voice agents</div></a>
+  <a class="api-card" href="/api-reference/conversation-ai"><span class="api-card-icon">🤖</span><div class="api-card-title">Conversation AI</div><div class="api-card-desc">AI conversation management</div></a>
+  <a class="api-card" href="/api-reference/agent-studio"><span class="api-card-icon">🕵</span><div class="api-card-title">Agent Studio</div><div class="api-card-desc">AI agent configuration</div></a>
+  <a class="api-card" href="/api-reference/ad-manager"><span class="api-card-icon">📡</span><div class="api-card-title">Ad Manager</div><div class="api-card-desc">Advertising campaign management</div></a>
+  <a class="api-card" href="/api-reference/affiliate-manager"><span class="api-card-icon">🤝</span><div class="api-card-title">Affiliate Manager</div><div class="api-card-desc">Affiliate program management</div></a>
+  <a class="api-card" href="/api-reference/knowledge-base"><span class="api-card-icon">📚</span><div class="api-card-title">Knowledge Base</div><div class="api-card-desc">Knowledge base articles</div></a>
+  <a class="api-card" href="/api-reference/proposals"><span class="api-card-icon">📄</span><div class="api-card-title">Proposals</div><div class="api-card-desc">Proposals and estimates</div></a>
+  <a class="api-card" href="/api-reference/brand-boards"><span class="api-card-icon">🎨</span><div class="api-card-title">Brand Boards</div><div class="api-card-desc">Brand asset management</div></a>
+  <a class="api-card" href="/api-reference/oauth"><span class="api-card-icon">🔐</span><div class="api-card-title">OAuth Endpoints</div><div class="api-card-desc">OAuth token management endpoints</div></a>
 </div>
