@@ -1,0 +1,107 @@
+{
+  "name": "Kleegr Developer Docs",
+  "logo": {
+    "light": "/assets/logo-light.png",
+    "dark": "/assets/logo-dark.png"
+  },
+  "favicon": "/assets/favicon.png",
+  "colors": {
+    "primary": "#7C3AED",
+    "light": "#A78BFA",
+    "dark": "#5B21B6"
+  },
+  "topbarLinks": [
+    {
+      "name": "Kleegr CRM",
+      "url": "https://crm.kleegr.com"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "kleegr.com",
+    "url": "https://kleegr.com"
+  },
+  "anchors": [
+    {
+      "name": "API Reference",
+      "icon": "rectangle-terminal",
+      "url": "api-reference"
+    },
+    {
+      "name": "OAuth Guide",
+      "icon": "lock",
+      "url": "docs/oauth"
+    },
+    {
+      "name": "Webhook Events",
+      "icon": "webhook",
+      "url": "docs/webhook-events"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": [
+        "docs/index",
+        "docs/oauth/Overview",
+        "docs/oauth/Authorization",
+        "docs/oauth/Scopes",
+        "docs/oauth/Faqs"
+      ]
+    },
+    {
+      "group": "OAuth 2.0",
+      "pages": [
+        "docs/oauth/Billing",
+        "docs/oauth/ExternalAuthentication",
+        "docs/oauth/WebhookAuthentication"
+      ]
+    },
+    {
+      "group": "Webhook Events",
+      "pages": [
+        "docs/webhook events/AppInstall",
+        "docs/webhook events/AppUninstall",
+        "docs/webhook events/ContactCreate",
+        "docs/webhook events/ContactUpdate",
+        "docs/webhook events/ContactDelete",
+        "docs/webhook events/ContactTagUpdate",
+        "docs/webhook events/ContactDndUpdate",
+        "docs/webhook events/ConversationUnreadWebhook",
+        "docs/webhook events/InboundMessage",
+        "docs/webhook events/OutboundMessage",
+        "docs/webhook events/OpportunityCreate",
+        "docs/webhook events/OpportunityUpdate",
+        "docs/webhook events/OpportunityDelete",
+        "docs/webhook events/AppointmentCreate",
+        "docs/webhook events/AppointmentUpdate",
+        "docs/webhook events/AppointmentDelete",
+        "docs/webhook events/InvoiceCreate",
+        "docs/webhook events/InvoiceSent",
+        "docs/webhook events/InvoicePaid",
+        "docs/webhook events/InvoiceVoid",
+        "docs/webhook events/OrderCreate",
+        "docs/webhook events/OrderStatusUpdate",
+        "docs/webhook events/UserCreate",
+        "docs/webhook events/LocationCreate",
+        "docs/webhook events/LocationUpdate"
+      ]
+    },
+    {
+      "group": "Marketplace Modules",
+      "pages": [
+        "docs/marketplace modules/shared_secret_customJS_customPages",
+        "docs/marketplace modules/CustomJs",
+        "docs/marketplace modules/ConversationProviders"
+      ]
+    },
+    {
+      "group": "Reference",
+      "pages": [
+        "docs/country list/Country"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "website": "https://kleegr.com"
+  }
+}

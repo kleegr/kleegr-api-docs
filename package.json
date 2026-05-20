@@ -1,0 +1,22 @@
+{
+  "name": "kleegr-api-docs",
+  "version": "1.0.0",
+  "description": "Kleegr developer documentation for integrations powered by HighLevel APIs",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "kleegr",
+    "api",
+    "developer",
+    "docs",
+    "crm",
+    "integrations"
+  ],
+  "author": "Kleegr",
+  "license": "CC0-1.0"
+}
