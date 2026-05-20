@@ -1,0 +1,24 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/businesses/{businessId}": {
+      "get": {"operationId": "get-business", "summary": "Get Business", "tags": ["Businesses"], "security": [{"bearer": ["businesses.readonly"]}], "parameters": [{"name": "Version", "in": "header", "required": true, "schema": {"type": "string", "enum": ["2021-07-28"]}}, {"name": "businessId", "required": true, "in": "path", "schema": {"type": "string"}}], "responses": {"200": {"description": "Success"}, "401": {"description": "Unauthorized"}}},
+      "put": {"operationId": "update-business", "summary": "Update Business", "tags": ["Businesses"], "security": [{"bearer": ["businesses.write"]}], "parameters": [{"name": "Version", "in": "header", "required": true, "schema": {"type": "string", "enum": ["2021-07-28"]}}, {"name": "businessId", "required": true, "in": "path", "schema": {"type": "string"}}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/UpdateBusinessDto"}}}}, "responses": {"200": {"description": "Success"}, "401": {"description": "Unauthorized"}}},
+      "delete": {"operationId": "delete-business", "summary": "Delete Business", "tags": ["Businesses"], "security": [{"bearer": ["businesses.write"]}], "parameters": [{"name": "Version", "in": "header", "required": true, "schema": {"type": "string", "enum": ["2021-07-28"]}}, {"name": "businessId", "required": true, "in": "path", "schema": {"type": "string"}}], "responses": {"200": {"description": "Success"}, "401": {"description": "Unauthorized"}}}
+    },
+    "/businesses/": {
+      "get": {"operationId": "get-businesses", "summary": "Get Businesses by Location", "tags": ["Businesses"], "security": [{"bearer": ["businesses.readonly"]}], "parameters": [{"name": "Version", "in": "header", "required": true, "schema": {"type": "string", "enum": ["2021-07-28"]}}, {"name": "locationId", "required": true, "in": "query", "schema": {"type": "string"}}], "responses": {"200": {"description": "Success"}, "401": {"description": "Unauthorized"}}},
+      "post": {"operationId": "create-business", "summary": "Create Business", "tags": ["Businesses"], "security": [{"bearer": ["businesses.write"]}], "parameters": [{"name": "Version", "in": "header", "required": true, "schema": {"type": "string", "enum": ["2021-07-28"]}}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateBusinessDto"}}}}, "responses": {"201": {"description": "Created"}, "401": {"description": "Unauthorized"}}}
+    }
+  },
+  "info": {"title": "Businesses API", "description": "Kleegr Businesses API", "version": "1.0"},
+  "tags": [{"name": "Businesses"}],
+  "servers": [{"url": "https://services.leadconnectorhq.com"}],
+  "components": {
+    "securitySchemes": {"bearer": {"scheme": "bearer", "bearerFormat": "JWT", "name": "Authorization", "in": "header", "type": "http"}},
+    "schemas": {
+      "CreateBusinessDto": {"type": "object", "required": ["name", "locationId"], "properties": {"name": {"type": "string"}, "locationId": {"type": "string"}, "phone": {"type": "string"}, "email": {"type": "string"}, "website": {"type": "string"}, "address": {"type": "string"}, "city": {"type": "string"}, "state": {"type": "string"}, "country": {"type": "string"}, "postalCode": {"type": "string"}}},
+      "UpdateBusinessDto": {"type": "object", "properties": {"name": {"type": "string"}, "phone": {"type": "string"}, "email": {"type": "string"}, "website": {"type": "string"}, "address": {"type": "string"}}}
+    }
+  }
+}

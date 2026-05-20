@@ -1,0 +1,17 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/snapshots/": {
+      "get": {"operationId": "get-snapshots", "summary": "Get Snapshots", "tags": ["Snapshots"], "security": [{"Agency-Access": ["snapshots.readonly"]}], "parameters": [{"name": "Version", "in": "header", "required": true, "schema": {"type": "string", "enum": ["2021-07-28"]}}, {"name": "companyId", "required": true, "in": "query", "schema": {"type": "string"}}], "responses": {"200": {"description": "Success"}, "401": {"description": "Unauthorized"}}}
+    }
+  },
+  "info": {"title": "Snapshots API", "description": "Kleegr Snapshots API", "version": "1.0"},
+  "tags": [{"name": "Snapshots"}],
+  "servers": [{"url": "https://services.leadconnectorhq.com"}],
+  "components": {
+    "securitySchemes": {"Agency-Access": {"scheme": "bearer", "bearerFormat": "JWT", "name": "Authorization", "in": "header", "type": "http"}},
+    "schemas": {
+      "SnapshotSchema": {"type": "object", "properties": {"id": {"type": "string"}, "name": {"type": "string"}, "type": {"type": "string"}}}
+    }
+  }
+}
