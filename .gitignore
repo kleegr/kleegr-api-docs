@@ -7,3 +7,9 @@ node_modules/
 # Spec files are fetched at build time by scripts/fetch-specs.mjs
 # Committed: small utility specs (workflows, campaigns, businesses, surveys, snapshots, courses)
 # Fetched at build: contacts, conversations, calendars, opportunities, invoices, payments, users, locations, forms, medias, funnels, blogs, social-media-posting
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example

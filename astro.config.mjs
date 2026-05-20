@@ -1,6 +1,8 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
+import cloudflare from "@astrojs/cloudflare";
+
 const sidebar = [
   { label: 'Getting Started', items: [{ label: 'Introduction', slug: 'getting-started' }] },
   { label: 'OAuth 2.0', collapsed: false, items: [
@@ -130,6 +132,7 @@ const sidebar = [
 
 export default defineConfig({
   output: 'static',
+
   integrations: [
     starlight({
       title: 'Kleegr Developers',
@@ -144,4 +147,6 @@ export default defineConfig({
       components: { Footer: './src/components/Footer.astro' },
     }),
   ],
+
+  adapter: cloudflare()
 });
