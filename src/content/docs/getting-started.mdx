@@ -22,33 +22,29 @@ Kleegr's API platform is powered by HighLevel APIs. This guide walks you through
 
 2. **Build the authorization URL**
 
-   Redirect the user to:
-
    ```
    https://marketplace.gohighlevel.com/oauth/chooselocation?
-   response_type=code&
-   redirect_uri=https://yourapp.com/callback&
-   client_id=YOUR_CLIENT_ID&
-   scope=contacts.readonly contacts.write
+   response_type=code&redirect_uri=https://yourapp.com/callback&
+   client_id=YOUR_CLIENT_ID&scope=contacts.readonly contacts.write
    ```
 
 3. **Exchange the code for a token**
 
    ```bash
-   curl -X POST https://services.leadconnectorhq.com/oauth/token \\
-     -H "Content-Type: application/x-www-form-urlencoded" \\
-     -d "client_id=YOUR_CLIENT_ID" \\
-     -d "client_secret=YOUR_CLIENT_SECRET" \\
-     -d "grant_type=authorization_code" \\
-     -d "code=AUTH_CODE" \\
+   curl -X POST https://services.leadconnectorhq.com/oauth/token \
+     -H "Content-Type: application/x-www-form-urlencoded" \
+     -d "grant_type=authorization_code" \
+     -d "client_id=YOUR_CLIENT_ID" \
+     -d "client_secret=YOUR_CLIENT_SECRET" \
+     -d "code=AUTH_CODE" \
      -d "redirect_uri=https://yourapp.com/callback"
    ```
 
 4. **Make an API call**
 
    ```bash
-   curl https://services.leadconnectorhq.com/contacts/search \\
-     -H "Authorization: Bearer ACCESS_TOKEN" \\
+   curl https://services.leadconnectorhq.com/contacts/search \
+     -H "Authorization: Bearer ACCESS_TOKEN" \
      -H "Version: 2021-07-28"
    ```
 
@@ -61,21 +57,11 @@ Kleegr's API platform is powered by HighLevel APIs. This guide walks you through
 | Burst | 100 requests / 10 seconds per app per location |
 | Daily | 200,000 requests / day per app per location |
 
-Monitor these response headers: `X-RateLimit-Limit-Daily`, `X-RateLimit-Daily-Remaining`, `X-RateLimit-Remaining`.
+Headers: `X-RateLimit-Limit-Daily`, `X-RateLimit-Daily-Remaining`, `X-RateLimit-Remaining`
 
 ## Token lifecycle
 
-- **Access tokens** expire after **24 hours** — refresh using the refresh token
-- **Refresh tokens** expire after **1 year** (reset on each use)
+- **Access tokens**: valid 24 hours — refresh with the refresh token
+- **Refresh tokens**: valid 1 year, reset on each use
 
-```bash
-curl -X POST https://services.leadconnectorhq.com/oauth/token \\
-  -d "grant_type=refresh_token" \\
-  -d "refresh_token=YOUR_REFRESH_TOKEN" \\
-  -d "client_id=YOUR_CLIENT_ID" \\
-  -d "client_secret=YOUR_CLIENT_SECRET"
-```
-
-<Aside type="tip">
-  See the full [OAuth 2.0 guide](/oauth/overview) for scopes, webhook authentication, and billing details.
-</Aside>
+<Aside type="tip">See the full [OAuth 2.0 guide](/oauth/overview) for scopes, webhook authentication, and billing details.</Aside>
