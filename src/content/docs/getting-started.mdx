@@ -3,52 +3,48 @@ title: Getting Started
 description: How to authenticate with Kleegr APIs and make your first request.
 ---
 
-import { Steps, Aside } from '@astrojs/starlight/components';
-
 Kleegr's API platform is powered by HighLevel APIs. This guide walks you through registering an OAuth app, getting an access token, and calling your first endpoint.
 
 ## Prerequisites
 
 - A Kleegr CRM account — [crm.kleegr.com](https://crm.kleegr.com)
-- A developer account at the HighLevel Marketplace (required for OAuth app registration)
+- A developer account at the [HighLevel Marketplace](https://marketplace.gohighlevel.com) (required for OAuth app registration)
 
 ## Quick start
 
-<Steps>
+**1. Register an OAuth app**
 
-1. **Register an OAuth app**
+Go to [marketplace.gohighlevel.com](https://marketplace.gohighlevel.com), sign in, navigate to **My Apps** → **Create App**. Set your redirect URI and note your `client_id` and `client_secret`.
 
-   Go to [marketplace.gohighlevel.com](https://marketplace.gohighlevel.com), sign in, navigate to **My Apps** → **Create App**. Set your redirect URI and note your `client_id` and `client_secret`.
+**2. Build the authorization URL**
 
-2. **Build the authorization URL**
+```
+https://marketplace.gohighlevel.com/oauth/chooselocation?
+response_type=code&
+redirect_uri=https://yourapp.com/callback&
+client_id=YOUR_CLIENT_ID&
+scope=contacts.readonly contacts.write
+```
 
-   ```
-   https://marketplace.gohighlevel.com/oauth/chooselocation?
-   response_type=code&redirect_uri=https://yourapp.com/callback&
-   client_id=YOUR_CLIENT_ID&scope=contacts.readonly contacts.write
-   ```
+**3. Exchange the code for a token**
 
-3. **Exchange the code for a token**
+```bash
+curl -X POST https://services.leadconnectorhq.com/oauth/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "client_id=YOUR_CLIENT_ID" \
+  -d "client_secret=YOUR_CLIENT_SECRET" \
+  -d "grant_type=authorization_code" \
+  -d "code=AUTH_CODE" \
+  -d "redirect_uri=https://yourapp.com/callback"
+```
 
-   ```bash
-   curl -X POST https://services.leadconnectorhq.com/oauth/token \
-     -H "Content-Type: application/x-www-form-urlencoded" \
-     -d "grant_type=authorization_code" \
-     -d "client_id=YOUR_CLIENT_ID" \
-     -d "client_secret=YOUR_CLIENT_SECRET" \
-     -d "code=AUTH_CODE" \
-     -d "redirect_uri=https://yourapp.com/callback"
-   ```
+**4. Make an API call**
 
-4. **Make an API call**
-
-   ```bash
-   curl https://services.leadconnectorhq.com/contacts/search \
-     -H "Authorization: Bearer ACCESS_TOKEN" \
-     -H "Version: 2021-07-28"
-   ```
-
-</Steps>
+```bash
+curl https://services.leadconnectorhq.com/contacts/search \
+  -H "Authorization: Bearer ACCESS_TOKEN" \
+  -H "Version: 2021-07-28"
+```
 
 ## Rate limits
 
@@ -61,7 +57,15 @@ Headers: `X-RateLimit-Limit-Daily`, `X-RateLimit-Daily-Remaining`, `X-RateLimit-
 
 ## Token lifecycle
 
-- **Access tokens**: valid 24 hours — refresh with the refresh token
-- **Refresh tokens**: valid 1 year, reset on each use
+- **Access tokens** expire after **24 hours** — refresh using the refresh token
+- **Refresh tokens** expire after **1 year** (reset on each use)
 
-<Aside type="tip">See the full [OAuth 2.0 guide](/oauth/overview) for scopes, webhook authentication, and billing details.</Aside>
+```bash
+curl -X POST https://services.leadconnectorhq.com/oauth/token \
+  -d "grant_type=refresh_token" \
+  -d "refresh_token=YOUR_REFRESH_TOKEN" \
+  -d "client_id=YOUR_CLIENT_ID" \
+  -d "client_secret=YOUR_CLIENT_SECRET"
+```
+
+See the [OAuth Authorization guide](/oauth/authorization) for scopes, webhook authentication, and billing details.
