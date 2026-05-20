@@ -1,11 +1,10 @@
 /**
- * scrape-marketplace-docs.mjs
- * Crawls https://marketplace.gohighlevel.com/docs/ using Playwright.
- * Fixed: strict URL filtering, robust content extraction, debug mode.
+ * scrape-marketplace-docs.mjs v3
+ * Uses "largest text block" strategy instead of brittle CSS selectors.
  */
 
 import { chromium } from 'playwright';
-import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import TurndownService from 'turndown';
 
@@ -13,172 +12,157 @@ const BASE_URL = 'https://marketplace.gohighlevel.com';
 const DOCS_BASE = `${BASE_URL}/docs`;
 const PROJECT = process.cwd();
 const DOCS_OUT = join(PROJECT, 'src/content/docs');
-const DEBUG = process.env.DEBUG === '1';
+const PAGE_DELAY_MS = 600;
+const TIMEOUT_MS = 20000;
+const MAX_PAGES = 400;
 
-// Only scrape URLs that match these patterns
-const VALID_DOC_PATTERNS = [
-  /\/docs\/oauth\//i,
-  /\/docs\/webhook\//i,
-  /\/docs\/api\//i,
-  /\/docs\/getting/i,
-  /\/docs\/introduction/i,
-  /\/docs\/overview/i,
-  /\/docs\/marketplace/i,
-  /\/docs\/custom/i,
-  /\/docs\/saas/i,
-  /\/docs\/white/i,
-  /\/docs\/app/i,
-  /\/docs\/billing/i,
-];
-
-// Content selectors to try in order
-const CONTENT_SELECTORS = [
-  '[class*="DocContent"]',
-  '[class*="doc-content"]',
-  '[class*="docs-content"]',
-  '[class*="Content"][class*="main"]',
-  '.markdown-body',
-  'article',
-  '[class*="article"]',
-  '[class*="markdown"]',
-  '[class*="Markdown"]',
-  'main [class*="content"]',
-  'main',
-];
-
-// Strip these from the page before extracting
-const STRIP_SELECTORS = [
-  'nav', 'header', 'footer',
-  '[class*="Sidebar"]', '[class*="sidebar"]',
-  '[class*="Navigation"]', '[class*="navigation"]',
-  '[class*="Header"]', '[class*="header"]',
-  '[class*="Footer"]', '[class*="footer"]',
-  '[class*="Breadcrumb"]', '[class*="breadcrumb"]',
-  '[class*="TableOfContents"]', '[class*="toc"]',
-  '[class*="Toolbar"]', '[class*="toolbar"]',
-  'button', 'script', 'style',
-  '[aria-hidden="true"]',
-  '[class*="feedback"]', '[class*="Feedback"]',
-  '[class*="pagination"]', '[class*="Pagination"]',
-];
-
-const PAGE_DELAY_MS = 800;
-const TIMEOUT_MS = 25000;
-const MAX_PAGES = 300;
-
-// Turndown setup
-const td = new TurndownService({
-  headingStyle: 'atx',
-  codeBlockStyle: 'fenced',
-  bulletListMarker: '-',
-});
-
+const td = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced', bulletListMarker: '-' });
 td.addRule('pre', {
   filter: ['pre'],
-  replacement(content, node) {
+  replacement(_, node) {
     const code = node.querySelector('code');
     const lang = code?.className?.match(/language-([\w+-]+)/)?.[1] || '';
-    const text = (code?.textContent || node.textContent || '').replace(/\r/g, '');
-    return `\n\`\`\`${lang}\n${text.trim()}\n\`\`\`\n`;
+    const text = (code?.textContent || node.textContent || '').replace(/\r/g, '').trim();
+    return `\n\`\`\`${lang}\n${text}\n\`\`\`\n`;
   },
 });
+td.remove(['script', 'style', 'noscript', 'svg', 'button', 'input', 'select']);
 
 function urlToSlug(url) {
-  return url
-    .replace(DOCS_BASE, '')
-    .replace(/^\//, '')
-    .replace(/\/$/, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9/]/g, '-')
-    .replace(/-+/g, '-');
+  return url.replace(DOCS_BASE, '').replace(/^\//, '').replace(/\/$/, '')
+    .toLowerCase().replace(/[^a-z0-9/]/g, '-').replace(/-+/g, '-');
 }
 
 function isValidDocUrl(url) {
   if (!url.startsWith(DOCS_BASE)) return false;
-  const path = url.replace(BASE_URL, '');
-  // Must be under /docs/ and not an API version path like /2021-07-28/
-  if (/\/\d{4}-\d{2}-\d{2}\//.test(path)) return false;
-  if (path === '/docs' || path === '/docs/') return false;
-  // Must have at least one path segment after /docs/
-  const afterDocs = path.replace('/docs/', '');
-  if (!afterDocs || afterDocs.length < 2) return false;
+  if (/\/\d{4}-\d{2}-\d{2}\//.test(url)) return false;
+  const path = url.replace(DOCS_BASE, '');
+  if (!path || path === '/') return false;
+  // skip pure tag/category listing pages
+  if (/^\/tags(\/|$)/.test(path) && path.split('/').length < 3) return false;
   return true;
 }
 
 function rewriteLinks(md) {
   return md
     .replace(/\[([^\]]+)\]\(https?:\/\/marketplace\.gohighlevel\.com\/docs\/([^)#\s]+)(#[^)]*)?\)/g,
-      (_, text, path, hash = '') => `[${text}](/scraped/${path.toLowerCase().replace(/[^a-z0-9/]/g, '-')}${hash})`)
+      (_, t, p, h = '') => `[${t}](/scraped/${p.toLowerCase().replace(/[^a-z0-9/]/g, '-')}${h})`)
     .replace(/\[([^\]]+)\]\(\/docs\/([^)#\s]+)(#[^)]*)?\)/g,
-      (_, text, path, hash = '') => `[${text}](/scraped/${path.toLowerCase().replace(/[^a-z0-9/]/g, '-')}${hash})`);
+      (_, t, p, h = '') => `[${t}](/scraped/${p.toLowerCase().replace(/[^a-z0-9/]/g, '-')}${h})`);
 }
 
 function rebrand(text) {
   const parts = text.split(/(```[\s\S]*?```|`[^`]+`)/g);
-  return parts.map((p, i) => {
-    if (i % 2 === 1) return p;
-    return p
-      .replace(/\bGoHighLevel\b(?![./\w-])/g, 'Kleegr')
-      .replace(/\bHighLevel\b(?![./\w-])/g, 'Kleegr');
-  }).join('');
+  return parts.map((p, i) => i % 2 === 1 ? p :
+    p.replace(/\bGoHighLevel\b(?![./\w-])/g, 'Kleegr').replace(/\bHighLevel\b(?![./\w-])/g, 'Kleegr')
+  ).join('');
 }
 
 async function extractContent(page, url) {
   try {
-    await page.goto(url, { waitUntil: 'networkidle', timeout: TIMEOUT_MS });
-    // Wait for content to render
-    await page.waitForTimeout(2000);
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: TIMEOUT_MS });
+    // Wait for React to render
+    await page.waitForTimeout(2500);
 
-    const title = (await page.title())
-      .replace(/\s*[-|].*$/, '').trim()
+    const rawTitle = await page.title().catch(() => '');
+    const title = rawTitle.replace(/\s*[-|].*$/, '').trim()
       .replace(/GoHighLevel/g, 'Kleegr').replace(/HighLevel/g, 'Kleegr');
 
-    if (DEBUG) {
-      const html = await page.content();
-      writeFileSync('/tmp/debug-page.html', html);
-      console.log(`\nDEBUG: Saved ${url} to /tmp/debug-page.html (${html.length} bytes)`);
-    }
-
-    // Strip nav/header/footer
-    await page.evaluate((sels) => {
-      sels.forEach(s => {
+    // Strategy: find the element with the most text that isn't nav/sidebar
+    const result = await page.evaluate(() => {
+      // Remove noise elements first
+      const noiseSelectors = [
+        'nav', 'header', 'footer', 'aside',
+        '[class*="navbar"]', '[class*="Navbar"]',
+        '[class*="sidebar"]', '[class*="Sidebar"]',
+        '[class*="header"]', '[class*="Header"]',
+        '[class*="footer"]', '[class*="Footer"]',
+        '[class*="breadcrumb"]', '[class*="Breadcrumb"]',
+        '[class*="toc"]', '[class*="TableOfContents"]',
+        '[class*="pagination"]', '[class*="Pagination"]',
+        '[class*="feedback"]', '[class*="Feedback"]',
+        '[class*="toolbar"]', '[class*="Toolbar"]',
+        '[class*="banner"]', '[class*="Banner"]',
+        'button', 'script', 'style', '[aria-hidden="true"]',
+      ];
+      noiseSelectors.forEach(s => {
         try { document.querySelectorAll(s).forEach(el => el.remove()); } catch {}
       });
-    }, STRIP_SELECTORS).catch(() => {});
 
-    // Try content selectors
-    let html = '';
-    for (const sel of CONTENT_SELECTORS) {
-      try {
-        const el = page.locator(sel).first();
-        const count = await el.count();
-        if (count > 0) {
-          const h = await el.innerHTML({ timeout: 3000 });
-          if (h && h.length > 200) { html = h; break; }
+      // Try common doc content selectors first
+      const preferredSelectors = [
+        'article',
+        '[class*="docContent"]', '[class*="DocContent"]',
+        '[class*="doc-content"]', '[class*="docs-content"]',
+        '[class*="content"][class*="main"]',
+        '[class*="Content"][class*="Main"]',
+        '[class*="markdownContent"]', '[class*="MarkdownContent"]',
+        '[class*="markdown-body"]', '[class*="markdown_body"]',
+        'main',
+        '[role="main"]',
+        '[class*="page-content"]', '[class*="pageContent"]',
+        '[class*="PageContent"]',
+        '[class*="container"] [class*="content"]',
+        '.container',
+        '#main-content', '#content',
+      ];
+
+      for (const sel of preferredSelectors) {
+        try {
+          const el = document.querySelector(sel);
+          if (el && el.innerText && el.innerText.trim().length > 200) {
+            return { html: el.innerHTML, selector: sel };
+          }
+        } catch {}
+      }
+
+      // Fallback: find the div/section with the most text content
+      const candidates = Array.from(document.querySelectorAll('div, section, article, main'));
+      let best = null;
+      let bestLen = 0;
+      for (const el of candidates) {
+        // Skip tiny, skip if it's a wrapper for the whole page (body-level)
+        if (el === document.body) continue;
+        const text = el.innerText?.trim() || '';
+        if (text.length > bestLen && text.length > 100) {
+          // Make sure this isn't a giant wrapper containing everything
+          // Prefer elements that are "leaf-ish" (their content is mostly text)
+          const childBlocks = el.querySelectorAll('div, section').length;
+          const textRatio = text.length / Math.max(el.innerHTML.length, 1);
+          if (textRatio > 0.1 || childBlocks < 20) {
+            best = el;
+            bestLen = text.length;
+          }
         }
-      } catch {}
+      }
+
+      if (best) return { html: best.innerHTML, selector: 'largest-block' };
+
+      // Last resort: whole body
+      const body = document.body;
+      if (body && body.innerText.trim().length > 50) {
+        return { html: body.innerHTML, selector: 'body' };
+      }
+
+      return { html: '', selector: 'none' };
+    });
+
+    if (!result.html || result.html.length < 50) {
+      // Take a screenshot for debugging
+      await page.screenshot({ path: '/tmp/scrape-fail.png', fullPage: false }).catch(() => {});
+      return { ok: false, error: `No content (selector tried: ${result?.selector || 'none'})` };
     }
 
-    // Fallback: get everything in body
-    if (!html || html.length < 100) {
-      html = await page.evaluate(() => {
-        const body = document.body;
-        return body ? body.innerHTML : '';
-      }).catch(() => '');
-    }
-
-    if (!html || html.length < 50) {
-      return { ok: false, error: 'No content found' };
-    }
-
-    let md = td.turndown(html);
+    let md = td.turndown(result.html);
     md = md.replace(/\n{3,}/g, '\n\n').trim();
     md = rebrand(md);
     md = rewriteLinks(md);
 
-    return { ok: true, title, md };
+    if (md.length < 30) return { ok: false, error: 'Content too short after conversion' };
+
+    return { ok: true, title, md, selector: result.selector };
   } catch (err) {
-    return { ok: false, error: err.message.split('\n')[0] };
+    return { ok: false, error: err.message.split('\n')[0].slice(0, 120) };
   }
 }
 
@@ -190,25 +174,21 @@ async function discoverLinks(page) {
     `${DOCS_BASE}/`,
   ];
   const visited = new Set();
-
   console.log('\nDiscovering docs pages...');
 
   while (toVisit.length && found.size < MAX_PAGES) {
     const url = toVisit.shift();
     if (visited.has(url)) continue;
     visited.add(url);
-
     try {
-      await page.goto(url, { waitUntil: 'networkidle', timeout: TIMEOUT_MS });
-      await page.waitForTimeout(1000);
-
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: TIMEOUT_MS });
+      await page.waitForTimeout(1200);
       const links = await page.evaluate((base) =>
         Array.from(document.querySelectorAll('a[href]'))
           .map(a => a.href.split('#')[0].replace(/\/$/, ''))
           .filter(h => h && h.startsWith(base) && h !== base),
         DOCS_BASE
       ).catch(() => []);
-
       for (const link of links) {
         if (!found.has(link) && !visited.has(link) && isValidDocUrl(link)) {
           found.add(link);
@@ -220,41 +200,50 @@ async function discoverLinks(page) {
       console.log(`  ! ${url.replace(DOCS_BASE, '')}: ${err.message.split('\n')[0]}`);
     }
   }
-
   return Array.from(found);
 }
 
 async function main() {
-  console.log('Kleegr Marketplace Docs Scraper v2');
+  console.log('Kleegr Marketplace Docs Scraper v3');
   console.log('====================================');
-  if (DEBUG) console.log('DEBUG MODE ON - saving HTML to /tmp/debug-page.html');
 
   const browser = await chromium.launch({
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
   });
   const ctx = await browser.newContext({
-    userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
     viewport: { width: 1280, height: 900 },
   });
   const page = await ctx.newPage();
   page.setDefaultTimeout(TIMEOUT_MS);
 
-  // Discover
   const allUrls = await discoverLinks(page);
-  console.log(`\nFound ${allUrls.length} doc pages to scrape\n`);
+  console.log(`\nFound ${allUrls.length} doc pages\n`);
 
   if (allUrls.length === 0) {
-    // Debug: take a screenshot to see what the page looks like
     await page.goto(`${DOCS_BASE}/oauth/GettingStarted`, { timeout: TIMEOUT_MS }).catch(() => {});
-    await page.screenshot({ path: '/tmp/debug-screenshot.png', fullPage: true }).catch(() => {});
-    console.log('Saved screenshot to /tmp/debug-screenshot.png');
-    console.log('Run: DEBUG=1 npm run scrape  to save HTML');
+    await page.screenshot({ path: '/tmp/scrape-debug.png', fullPage: true }).catch(() => {});
+    console.log('No pages found. Screenshot saved to /tmp/scrape-debug.png');
     await browser.close();
     process.exit(1);
   }
 
-  // Scrape each page
+  // Test first page and show what we get
+  console.log('Testing content extraction on first page...');
+  const testResult = await extractContent(page, allUrls[0]);
+  console.log(`  URL: ${allUrls[0].replace(DOCS_BASE, '')}`);
+  console.log(`  Title: ${testResult.title || '(none)'}`);
+  console.log(`  Selector used: ${testResult.selector || 'N/A'}`);
+  console.log(`  Content length: ${testResult.md?.length || 0} chars`);
+  console.log(`  Status: ${testResult.ok ? 'OK' : 'FAIL: ' + testResult.error}`);
+  if (testResult.ok) {
+    console.log(`  Preview: ${testResult.md.slice(0, 200).replace(/\n/g, ' ')}...`);
+  } else {
+    console.log('  Screenshot saved to /tmp/scrape-fail.png for debugging');
+  }
+  console.log('');
+
   const results = [];
   const sidebar = {};
   let ok = 0, fail = 0;
@@ -263,68 +252,52 @@ async function main() {
     const slug = urlToSlug(url);
     const parts = slug.split('/');
     const section = parts[0] || 'general';
-    const name = parts.slice(1).join('-') || parts[0];
-
     process.stdout.write(`  ${url.replace(DOCS_BASE, '')} ... `);
 
-    const result = await extractContent(page, url);
+    const r = await extractContent(page, url);
 
-    if (result.ok && result.md.length > 50) {
-      const dir = join(DOCS_OUT, 'scraped', ...parts.slice(0, -1));
-      mkdirSync(dir, { recursive: true });
-
-      const safeTitle = (result.title || name).replace(/"/g, '\\"');
-      const mdx = `---\ntitle: "${safeTitle}"\ndescription: "${safeTitle} \u2014 Kleegr documentation"\n---\n\n${result.md}\n`;
-      writeFileSync(join(DOCS_OUT, 'scraped', slug + '.mdx'), mdx, 'utf-8');
-
-      if (!sidebar[section]) sidebar[section] = [];
-      sidebar[section].push({
-        label: result.title || name,
-        slug: `scraped/${slug}`,
-      });
-
-      results.push({ url, slug, title: result.title, status: 'ok', chars: result.md.length });
+    if (r.ok && r.md.length > 30) {
+      mkdirSync(join(DOCS_OUT, 'scraped', ...parts.slice(0, -1)), { recursive: true });
+      const safeTitle = (r.title || parts[parts.length - 1]).replace(/"/g, '\\"');
+      writeFileSync(
+        join(DOCS_OUT, 'scraped', slug + '.mdx'),
+        `---\ntitle: "${safeTitle}"\ndescription: "${safeTitle} \u2014 Kleegr documentation"\n---\n\n${r.md}\n`,
+        'utf-8'
+      );
+      (sidebar[section] = sidebar[section] || []).push({ label: r.title || parts[parts.length-1], slug: `scraped/${slug}` });
+      results.push({ url, slug, title: r.title, status: 'ok', chars: r.md.length, selector: r.selector });
       ok++;
-      console.log(`ok (${result.md.length}c)`);
+      console.log(`ok (${r.md.length}c, ${r.selector})`);
     } else {
-      results.push({ url, slug, status: 'fail', error: result.error });
+      results.push({ url, slug, status: 'fail', error: r.error });
       fail++;
-      console.log(`FAIL: ${result.error}`);
+      console.log(`FAIL: ${r.error}`);
     }
-
     await page.waitForTimeout(PAGE_DELAY_MS);
   }
 
   await browser.close();
 
-  // Write sidebar
-  const sidebarConfig = {
+  writeFileSync(join(PROJECT, 'scraped-sidebar.json'), JSON.stringify({
     label: 'Marketplace Docs',
     collapsed: false,
     items: Object.entries(sidebar).map(([sec, items]) => ({
-      label: sec.charAt(0).toUpperCase() + sec.slice(1),
-      collapsed: sec !== 'oauth',
-      items,
+      label: sec.charAt(0).toUpperCase() + sec.slice(1), collapsed: sec !== 'oauth', items,
     })),
-  };
-  writeFileSync(join(PROJECT, 'scraped-sidebar.json'), JSON.stringify(sidebarConfig, null, 2));
-
-  // Write log
-  writeFileSync(join(PROJECT, 'scrape-log.json'), JSON.stringify({
-    timestamp: new Date().toISOString(),
-    total: allUrls.length,
-    ok, fail,
-    pages: results,
   }, null, 2));
 
+  writeFileSync(join(PROJECT, 'scrape-log.json'), JSON.stringify(
+    { timestamp: new Date().toISOString(), total: allUrls.length, ok, fail, pages: results }, null, 2
+  ));
+
   console.log(`\n${'='.repeat(40)}`);
-  console.log(`Scraped: ${ok} ok, ${fail} failed`);
+  console.log(`Done: ${ok} scraped, ${fail} failed`);
   if (fail > 0) {
-    console.log('\nFailed pages:');
-    results.filter(r => r.status === 'fail').slice(0, 10).forEach(r =>
-      console.log(`  ✗ ${r.url.replace(DOCS_BASE, '')} — ${r.error}`));
+    const failedList = results.filter(r => r.status === 'fail').slice(0, 15);
+    console.log('\nFailed (first 15):');
+    failedList.forEach(r => console.log(`  x ${r.url.replace(DOCS_BASE, '')} - ${r.error}`));
   }
-  console.log(`\nNext: npm run build && git add -A && git commit -m "docs: scraped" && git push`);
+  console.log(`\nNext: npm run build && git add -A && git commit -m "docs: scraped ${ok} pages" && git push`);
 }
 
 main().catch(e => { console.error('Fatal:', e.message); process.exit(1); });
