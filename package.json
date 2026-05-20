@@ -6,7 +6,8 @@
     "dev": "node scripts/fetch-specs.mjs && astro dev",
     "build": "node scripts/fetch-specs.mjs && astro build",
     "preview": "astro preview",
-    "fetch-specs": "node scripts/fetch-specs.mjs"
+    "fetch-specs": "node scripts/fetch-specs.mjs",
+    "import-docs": "node scripts/import-highlevel-docs.mjs"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.32.5",
