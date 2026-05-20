@@ -1,16 +1,10 @@
 ---
 title: UserCreate
-description: Webhook payload when a new user is created in a Kleegr CRM location.
+description: Webhook when a new user is created in a Kleegr CRM location.
 ---
 
 ```json
-{
-  "type": "UserCreate",
-  "locationId": "ve9EPM428h8vShlRW1KT",
-  "id": "YlWd2wuCAZQzh2cH1fVZ",
-  "firstName": "Jane", "lastName": "Smith",
-  "email": "jane@example.com", "role": "user", "type": "account"
-}
+{"type":"UserCreate","locationId":"ve9EPM428h8vShlRW1KT","id":"YlWd2wuCAZQzh2cH1fVZ","firstName":"Jane","lastName":"Smith","email":"jane@example.com","role":"user","type":"account"}
 ```
 
 **Required scope:** `users.readonly`
