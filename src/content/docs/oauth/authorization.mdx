@@ -5,75 +5,42 @@ description: OAuth 2.0 Authorization Code Grant flow for Kleegr CRM integrations
 
 import { Steps, Aside } from '@astrojs/starlight/components';
 
-## Step 1 — Register an OAuth app
+<Steps>
 
-1. Go to [marketplace.gohighlevel.com](https://marketplace.gohighlevel.com)
-2. Sign in or create a developer account
-3. Navigate to **My Apps** → **Create App**
-4. Configure your `redirect_uri`, `scopes`, and note your `client_id` / `client_secret`
+1. **Register an OAuth app** at [marketplace.gohighlevel.com](https://marketplace.gohighlevel.com) under My Apps.
 
-## Step 2 — Build the Authorization URL
+2. **Build the Authorization URL**
 
-**Standard flow:**
-```
-https://marketplace.gohighlevel.com/oauth/chooselocation?
-response_type=code&
-redirect_uri=https://yourapp.com/oauth/callback&
-client_id=YOUR_CLIENT_ID&
-scope=contacts.readonly conversations/message.write
-```
+   ```
+   https://marketplace.gohighlevel.com/oauth/chooselocation?
+   response_type=code&redirect_uri=https://yourapp.com/callback&
+   client_id=YOUR_CLIENT_ID&scope=contacts.readonly
+   ```
 
-**White-label flow:**
-```
-https://marketplace.leadconnectorhq.com/oauth/chooselocation?
-response_type=code&
-redirect_uri=https://yourapp.com/oauth/callback&
-client_id=YOUR_CLIENT_ID&
-scope=contacts.readonly conversations/message.write
-```
+   White-label: use `marketplace.leadconnectorhq.com` instead.
 
-<Aside>To open the login in the same tab, append `&loginWindowOpenMode=self`.</Aside>
+3. **Handle the callback** — user is sent to `https://yourapp.com/callback?code=AUTH_CODE`
 
-## Step 3 — Handle the callback
+4. **Exchange code for tokens**
 
-After the user grants access:
-```
-https://yourapp.com/oauth/callback?code=AUTH_CODE_HERE
-```
+   ```bash
+   curl -X POST https://services.leadconnectorhq.com/oauth/token \
+     -H "Content-Type: application/x-www-form-urlencoded" \
+     -d "client_id=YOUR_CLIENT_ID&client_secret=YOUR_SECRET" \
+     -d "grant_type=authorization_code&code=AUTH_CODE" \
+     -d "redirect_uri=https://yourapp.com/callback"
+   ```
 
-## Step 4 — Exchange code for tokens
+5. **Refresh the token** (tokens expire after 24 hours)
 
-```bash
-curl -X POST https://services.leadconnectorhq.com/oauth/token \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "client_id=YOUR_CLIENT_ID" \
-  -d "client_secret=YOUR_CLIENT_SECRET" \
-  -d "grant_type=authorization_code" \
-  -d "code=AUTH_CODE_HERE" \
-  -d "redirect_uri=https://yourapp.com/oauth/callback"
-```
+   ```bash
+   curl -X POST https://services.leadconnectorhq.com/oauth/token \
+     -H "Content-Type: application/x-www-form-urlencoded" \
+     -d "client_id=YOUR_CLIENT_ID&client_secret=YOUR_SECRET" \
+     -d "grant_type=refresh_token&refresh_token=YOUR_REFRESH_TOKEN"
+   ```
 
-**Response:**
-```json
-{
-  "access_token": "eyJ...",
-  "refresh_token": "eyJ...",
-  "expires_in": 86400,
-  "token_type": "Bearer",
-  "locationId": "LOCATION_ID"
-}
-```
-
-## Step 5 — Refresh the token
-
-```bash
-curl -X POST https://services.leadconnectorhq.com/oauth/token \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "client_id=YOUR_CLIENT_ID" \
-  -d "client_secret=YOUR_CLIENT_SECRET" \
-  -d "grant_type=refresh_token" \
-  -d "refresh_token=YOUR_REFRESH_TOKEN"
-```
+</Steps>
 
 ## Rate limits
 

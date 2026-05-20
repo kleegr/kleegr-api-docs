@@ -3,27 +3,21 @@ title: API Attribution
 description: Legal and technical attribution for Kleegr developer integrations.
 ---
 
-## Technical attribution
-
-Kleegr developer integrations are powered by HighLevel APIs. Certain technical references are retained exactly as-is for integration accuracy.
+Kleegr developer integrations are powered by HighLevel APIs. Certain technical references are retained for integration accuracy.
 
 ## What is retained and why
 
 | Reference | Reason |
 |-----------|--------|
-| `marketplace.gohighlevel.com` OAuth registration | Developers must register OAuth apps here |
-| `marketplace.leadconnectorhq.com` OAuth URL | Required for white-label deployment flows |
-| `services.leadconnectorhq.com` API base URL | The actual endpoint for all API calls |
-| OAuth scope strings (e.g. `contacts.readonly`) | Part of the API contract — must be exact |
-| All endpoint paths (e.g. `/contacts/search`) | The actual URL paths for API calls |
-| Field names and schema definitions | Required for correct request/response handling |
-| Webhook signature public key | Required to verify webhook authenticity |
-| Rate limit headers (`X-RateLimit-*`) | Documented for developer monitoring |
+| OAuth registration at `marketplace.gohighlevel.com` | Required to get OAuth credentials |
+| White-label OAuth URL `marketplace.leadconnectorhq.com` | Required for white-label flows |
+| API base URL `services.leadconnectorhq.com` | All API calls go here |
+| OAuth scope strings (e.g. `contacts.readonly`) | Part of the API contract |
+| All endpoint paths (e.g. `/contacts/search`) | The actual API URLs |
+| Field names and schema definitions | Required for correct integrations |
+| Webhook signature public key | Required for verification |
+| Rate limit headers (`X-RateLimit-*`) | Documented for monitoring |
 
 ## Documentation source
 
-This documentation is based on the [GoHighLevel API V2 documentation](https://github.com/GoHighLevel/highlevel-api-docs), released under CC0 1.0 Universal (public domain).
-
-## Trademarks
-
-"GoHighLevel" and "HighLevel" are trademarks of HighLevel Inc. Kleegr is not affiliated with or endorsed by HighLevel Inc. Technical references are used solely for integration accuracy.
+Based on the GoHighLevel API V2 documentation, released under CC0 1.0 Universal (public domain). "GoHighLevel" and "HighLevel" are trademarks of HighLevel Inc. Kleegr is not affiliated with HighLevel Inc.

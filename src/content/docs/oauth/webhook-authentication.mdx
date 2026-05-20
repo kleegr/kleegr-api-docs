@@ -1,14 +1,9 @@
 ---
 title: Webhook Authentication
-description: Verify that inbound webhook payloads originate from Kleegr CRM.
+description: Verify inbound webhook signatures from Kleegr CRM.
 ---
 
-Every webhook payload includes an `x-wh-signature` header. Use the public key below to verify it.
-
-## How to verify
-
-1. Extract `x-wh-signature` from request headers
-2. Verify the payload against this public key:
+Every webhook includes `x-wh-signature`. Verify it with this public key:
 
 ```
 -----BEGIN PUBLIC KEY-----
@@ -27,29 +22,16 @@ T1hhTiaCeIY/OwwwNUY2yvcCAwEAAQ==
 -----END PUBLIC KEY-----
 ```
 
-## Node.js example
+## Node.js verification
 
 ```javascript
 const crypto = require('crypto');
-
-const PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----`;
-
 function verifyWebhook(rawBody, signature) {
-  const verifier = crypto.createVerify('SHA256');
-  verifier.update(rawBody);
-  return verifier.verify(PUBLIC_KEY, signature, 'base64');
+  const v = crypto.createVerify('SHA256');
+  v.update(rawBody);
+  return v.verify(PUBLIC_KEY, signature, 'base64');
 }
-
-app.post('/webhook', (req, res) => {
-  const sig = req.headers['x-wh-signature'];
-  if (!verifyWebhook(JSON.stringify(req.body), sig)) {
-    return res.status(401).send('Invalid signature');
-  }
-  res.sendStatus(200);
-});
 ```
 
-## Prevent replay attacks
-
-- Reject requests with `timestamp` older than 5 minutes
-- Track and reject duplicate `webhookId` values
+- Reject payloads with `timestamp` older than 5 minutes
+- Reject duplicate `webhookId` values

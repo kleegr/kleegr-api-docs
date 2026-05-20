@@ -3,98 +3,50 @@ title: OAuth Scopes
 description: Available OAuth permission scopes for Kleegr API integrations.
 ---
 
-import { Aside } from '@astrojs/starlight/components';
-
-<Aside type="caution">Scope strings are part of the API contract. Use them exactly as listed.</Aside>
-
 ## Contacts
-
-| Scope | Access |
-|-------|--------|
-| `contacts.readonly` | Read contact records |
-| `contacts.write` | Create and update contacts |
+| `contacts.readonly` | Read contacts | `contacts.write` | Create/update contacts |
 
 ## Conversations
-
 | Scope | Access |
 |-------|--------|
 | `conversations.readonly` | Read conversations |
-| `conversations.write` | Create and update conversations |
-| `conversations/message.readonly` | Read messages, recordings, transcriptions |
-| `conversations/message.write` | Send messages, add call logs |
+| `conversations.write` | Create/update conversations |
+| `conversations/message.readonly` | Read messages |
+| `conversations/message.write` | Send messages |
 
 ## Calendars
-
 | Scope | Access |
 |-------|--------|
 | `calendars.readonly` | Read calendars |
-| `calendars.write` | Create and manage calendars |
+| `calendars.write` | Manage calendars |
 | `calendars/events.readonly` | Read appointments |
-| `calendars/events.write` | Create and update appointments |
+| `calendars/events.write` | Create/update appointments |
 
 ## Opportunities
-
-| Scope | Access |
-|-------|--------|
-| `opportunities.readonly` | Read pipeline opportunities |
-| `opportunities.write` | Create and update opportunities |
+| `opportunities.readonly` | Read |
+| `opportunities.write` | Create/update |
 
 ## Invoices & Payments
-
-| Scope | Access |
-|-------|--------|
 | `invoices.readonly` | Read invoices |
-| `invoices.write` | Create and manage invoices |
-| `payments.readonly` | Read payment records |
-| `payments.write` | Create and manage payments |
+| `invoices.write` | Manage invoices |
+| `payments.readonly` | Read payments |
+| `payments.write` | Manage payments |
 
 ## Users & Locations
+| `users.readonly` | Read users |
+| `users.write` | Manage users |
+| `locations.readonly` | Read sub-accounts |
+| `locations.write` | Update sub-accounts |
 
-| Scope | Access |
-|-------|--------|
-| `users.readonly` | Read user records |
-| `users.write` | Create and update users |
-| `locations.readonly` | Read sub-account settings |
-| `locations.write` | Update sub-account settings |
-| `locations/tags.readonly` | Read tags |
-| `locations/tags.write` | Manage tags |
-
-## Forms, Surveys & Content
-
-| Scope | Access |
-|-------|--------|
-| `forms.readonly` | Forms and submissions |
+## Forms, Surveys, Content
+| `forms.readonly` | Forms/submissions |
 | `surveys.readonly` | Survey responses |
-| `funnels.readonly` | Read funnels |
-| `blogs.readonly` | Read blogs |
-| `blogs.write` | Manage blog posts |
+| `blogs.readonly` / `blogs.write` | Blog management |
 
 ## Workflows & Campaigns
-
-| Scope | Access |
-|-------|--------|
-| `workflows.readonly` | Read workflow definitions |
+| `workflows.readonly` | Read workflows |
 | `campaigns.readonly` | Read campaigns |
 
-## Media
-
-| Scope | Access |
-|-------|--------|
-| `medias.readonly` | Read media library |
-| `medias.write` | Upload to media library |
-
-## Products
-
-| Scope | Access |
-|-------|--------|
-| `products.readonly` | Read products and prices |
-| `products.write` | Manage products |
-
-## Businesses & Companies
-
-| Scope | Access |
-|-------|--------|
-| `businesses.readonly` | Read business records |
-| `businesses.write` | Manage businesses |
-| `companies.readonly` | Read companies |
-| `companies.write` | Manage companies |
+## Media & Products
+| `medias.readonly` / `medias.write` | Media library |
+| `products.readonly` / `products.write` | Products |

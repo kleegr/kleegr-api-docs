@@ -5,27 +5,19 @@ description: Common questions about Kleegr OAuth 2.0 authentication.
 
 ## How long are access tokens valid?
 
-Access tokens are valid for **24 hours**. Use the refresh token to get a new one.
+**24 hours**. Refresh using the refresh token.
 
 ## How long are refresh tokens valid?
 
-Refresh tokens are valid for **1 year** and reset with each use.
+**1 year**, reset on each use.
 
-## How should I handle token expiry?
+## How do I handle token expiry?
 
 1. Make a request with the current `access_token`
-2. If you get `401 Unauthorized`, call the token refresh endpoint
-3. Store the new tokens and retry the request
+2. On `401 Unauthorized`, call the token refresh endpoint
+3. Store new tokens and retry
 
-## How do I listen to webhook events?
+## Rate limits?
 
-1. In your OAuth app settings, set a **Webhook URL** and add required scopes
-2. Have a location admin install and authorize your app
-3. You will receive webhook payloads for that location
-
-## What are the rate limits?
-
-- **Burst:** 100 requests per 10 seconds per app per location
-- **Daily:** 200,000 requests per day per app per location
-
-Each installed location has its own independent budget.
+- Burst: 100 req / 10 sec per app per location
+- Daily: 200,000 req / day per app per location
